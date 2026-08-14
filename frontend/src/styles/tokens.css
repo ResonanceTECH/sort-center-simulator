@@ -1,0 +1,71 @@
+:root {
+  --color-ozon-blue: #005BFF;
+  --color-dark-space: #001A34;
+  --color-morning-blue: #00A2FF;
+  --color-white: #FFFFFF;
+
+  --color-primary: var(--color-ozon-blue);
+  --color-secondary: var(--color-morning-blue);
+  --color-text-primary: var(--color-dark-space);
+  --color-text-inverse: var(--color-white);
+  --color-background: var(--color-white);
+  --color-surface: var(--color-white);
+
+  --color-border: rgba(0, 26, 52, 0.12);
+  --color-border-strong: rgba(0, 26, 52, 0.24);
+
+  --color-primary-soft: rgba(0, 91, 255, 0.08);
+  --color-primary-medium: rgba(0, 91, 255, 0.16);
+
+  --color-secondary-soft: rgba(0, 162, 255, 0.10);
+  --color-secondary-medium: rgba(0, 162, 255, 0.20);
+
+  --color-text-secondary: rgba(0, 26, 52, 0.64);
+  --color-text-tertiary: rgba(0, 26, 52, 0.44);
+  --color-disabled: rgba(0, 26, 52, 0.32);
+
+  --shadow-small: 0 2px 8px rgba(0, 26, 52, 0.08);
+  --shadow-medium: 0 8px 24px rgba(0, 26, 52, 0.12);
+  --shadow-large: 0 16px 40px rgba(0, 26, 52, 0.16);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 91, 255, 0.40) rgba(0, 26, 52, 0.06);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(0, 26, 52, 0.06);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 91, 255, 0.40);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #005BFF;
+}
