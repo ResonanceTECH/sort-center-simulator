@@ -25,6 +25,19 @@ export interface AuthResponse {
   token: string;
 }
 
+export interface UserApiResponse {
+  id: string;
+  name: string;
+  email: string;
+  team?: string;
+}
+
+export interface AuthApiResponse {
+  user: UserApiResponse;
+  access_token?: string;
+  token?: string;
+}
+
 export interface StoredUser extends User {
   password: string;
 }
