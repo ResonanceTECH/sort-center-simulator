@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { onUnauthorized } from '@/api/authEvents';
 import { AuthContext, type AuthContextValue } from '@/context/authContext';
 import * as authService from '@/services/authService';
 import type { LoginData, RegisterData, User } from '@/types/auth';
@@ -16,6 +17,13 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    return onUnauthorized(() => {
+      authService.logout();
+      setUser(null);
+    });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
