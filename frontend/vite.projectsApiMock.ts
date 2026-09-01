@@ -209,6 +209,104 @@ function toProjectResponse(project: MockProject) {
   };
 }
 
+type ListSort = 'recent' | 'oldest' | 'name_asc' | 'name_desc' | 'archived';
+
+interface MockListItem {
+  id: string;
+  name: string;
+  updated_at: string;
+  status: string;
+  thumbnail: string;
+  thumbnail_alt: string;
+  scenarios_count: number;
+  last_result: { status: string | null; label: string };
+  active_run: { progress: number; label: string } | null;
+}
+
+const THUMBNAILS = [
+  '/images/project-plan-1.svg',
+  '/images/project-plan-2.svg',
+  '/images/project-plan-3.svg',
+  '/images/project-plan-4.svg',
+  '/images/project-plan-5.svg',
+  '/images/project-thumb-1.svg',
+  '/images/project-thumb-2.svg',
+];
+
+function mapLastResultLabel(status: string, runName?: string): string {
+  if (status === 'completed') return 'Успешно';
+  if (status === 'failed') return 'Ошибка';
+  if (status === 'running') return runName ?? 'Выполняется';
+  if (status === 'queued') return 'В очереди';
+  return 'Нет результатов';
+}
+
+function toListItem(project: MockProject, index: number): MockListItem {
+  const lastRun = project.last_run;
+  const lastStatus = lastRun?.status ?? null;
+  const isRunning = lastStatus === 'running';
+
+  return {
+    id: project.id,
+    name: project.name,
+    updated_at: project.updated_at,
+    status: project.status,
+    thumbnail: THUMBNAILS[index % THUMBNAILS.length],
+    thumbnail_alt: `Превью проекта «${project.name}»`,
+    scenarios_count: project.scenarios.length,
+    last_result: lastRun
+      ? {
+          status: lastStatus,
+          label: mapLastResultLabel(lastStatus ?? '', lastRun.name),
+        }
+      : { status: null, label: 'Нет результатов' },
+    active_run: isRunning
+      ? { progress: 62, label: lastRun?.name ?? 'Симуляция' }
+      : null,
+  };
+}
+
+function filterAndSortMockProjects(
+  items: MockListItem[],
+  search: string,
+  status: string,
+  sort: ListSort,
+): MockListItem[] {
+  let result = [...items];
+  const q = search.trim().toLowerCase();
+
+  if (q) {
+    result = result.filter((item) => item.name.toLowerCase().includes(q));
+  }
+
+  if (status !== 'all') {
+    result = result.filter((item) => item.status === status);
+  } else if (sort === 'archived') {
+    result = result.filter((item) => item.status === 'archived');
+  } else {
+    result = result.filter((item) => item.status !== 'archived');
+  }
+
+  switch (sort) {
+    case 'oldest':
+      result.sort((a, b) => +new Date(a.updated_at) - +new Date(b.updated_at));
+      break;
+    case 'name_asc':
+      result.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+      break;
+    case 'name_desc':
+      result.sort((a, b) => b.name.localeCompare(a.name, 'ru'));
+      break;
+    case 'archived':
+    case 'recent':
+    default:
+      result.sort((a, b) => +new Date(b.updated_at) - +new Date(a.updated_at));
+      break;
+  }
+
+  return result;
+}
+
 function buildSeedProjects(): MockProject[] {
   return [
     createProjectSeed({
@@ -385,6 +483,34 @@ export function projectsApiMockPlugin(): Plugin {
         const method = req.method ?? 'GET';
 
         try {
+          // GET /api/v1/projects
+          if (route.action === 'root' && method === 'GET') {
+            const url = new URL(req.url ?? '', 'http://localhost');
+            const search = url.searchParams.get('search') ?? '';
+            const status = url.searchParams.get('status') ?? 'all';
+            const sort = (url.searchParams.get('sort') ?? 'recent') as ListSort;
+            const page = Math.max(1, Number(url.searchParams.get('page') ?? 1));
+            const pageSize = Math.max(1, Number(url.searchParams.get('page_size') ?? 5));
+
+            const allItems = Array.from(projects.values()).map((project, index) =>
+              toListItem(project, index),
+            );
+            const filtered = filterAndSortMockProjects(allItems, search, status, sort);
+            const start = (page - 1) * pageSize;
+            const items = filtered.slice(start, start + pageSize);
+
+            await wait(350);
+            sendJson(res, 200, {
+              items,
+              total_count: filtered.length,
+              page,
+              page_size: pageSize,
+              has_more: start + items.length < filtered.length,
+              notifications: [],
+            });
+            return;
+          }
+
           // GET /api/v1/projects/{projectId}
           if (route.action === 'item' && method === 'GET') {
             const project = projects.get(route.projectId);
