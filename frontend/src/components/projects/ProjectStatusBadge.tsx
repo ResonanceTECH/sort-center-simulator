@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { ArchiveOutlined, EditOutlined, ErrorOutline } from '@mui/icons-material';
+import { ArchiveOutlined, Autorenew, CheckCircleOutline, EditOutlined, ErrorOutline } from '@mui/icons-material';
 import { STATUS_CONFIG } from '@/constants/projects';
 import type { ProjectListStatus } from '@/types/projects';
 
@@ -7,6 +7,8 @@ const ICONS = {
   ErrorOutline,
   EditOutlined,
   ArchiveOutlined,
+  CheckCircleOutline,
+  Autorenew,
 } as const;
 
 interface ProjectStatusBadgeProps {
