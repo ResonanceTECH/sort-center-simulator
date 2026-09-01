@@ -19,10 +19,22 @@ export const PROJECTS_PAGE = {
 
 export const STATUS_FILTER_OPTIONS: { value: ProjectListStatus | 'all'; label: string }[] = [
   { value: 'all', label: 'Все статусы' },
+  { value: 'draft', label: 'Черновик' },
+  { value: 'ready', label: 'Готов к расчету' },
+  { value: 'running', label: 'Выполняется' },
   { value: 'completed', label: 'Завершен' },
   { value: 'error', label: 'С ошибкой' },
-  { value: 'draft', label: 'Черновик' },
+  { value: 'archived', label: 'Архив' },
 ];
+
+export const PROJECT_STATUS_LABELS: Record<ProjectListStatus, string> = {
+  draft: 'Черновик',
+  ready: 'Готов к расчету',
+  running: 'Выполняется',
+  completed: 'Завершен',
+  error: 'С ошибкой',
+  archived: 'Архив',
+};
 
 export const SORT_OPTIONS: { value: ProjectSortOption; label: string }[] = [
   { value: 'recent', label: 'Сначала недавно измененные' },
@@ -36,6 +48,27 @@ export const STATUS_CONFIG: Record<
   ProjectListStatus,
   { label: string; icon: string; color: string; bg: string; border: string }
 > = {
+  draft: {
+    label: 'Черновик',
+    icon: 'EditOutlined',
+    color: '#667085',
+    bg: PROJECTS_PAGE.draftBg,
+    border: PROJECTS_PAGE.border,
+  },
+  ready: {
+    label: 'Готов к расчету',
+    icon: 'CheckCircleOutline',
+    color: '#175CD3',
+    bg: '#EFF8FF',
+    border: '#B2DDFF',
+  },
+  running: {
+    label: 'Выполняется',
+    icon: 'Autorenew',
+    color: PROJECTS_PAGE.warning,
+    bg: '#FFFAEB',
+    border: '#FEDF89',
+  },
   completed: {
     label: 'Завершен',
     icon: '',
@@ -49,13 +82,6 @@ export const STATUS_CONFIG: Record<
     color: PROJECTS_PAGE.error,
     bg: PROJECTS_PAGE.errorBg,
     border: PROJECTS_PAGE.errorBorder,
-  },
-  draft: {
-    label: 'Черновик',
-    icon: 'EditOutlined',
-    color: '#667085',
-    bg: PROJECTS_PAGE.draftBg,
-    border: PROJECTS_PAGE.border,
   },
   archived: {
     label: 'Архив',

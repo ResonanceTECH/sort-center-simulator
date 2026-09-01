@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { apiClient } from '@/api/client';
+import { mapProjectStatus, mapScenarioSummary } from '@/api/mappers';
 import {
   cacheProjectDetail,
   getRunDetail,
@@ -7,7 +8,6 @@ import {
 } from '@/mocks/projectWorkspaceData';
 import { getProjectsNotifications } from '@/mocks/projectsData';
 import { delay, getErrorMessage } from '@/utils/error';
-import type { ProjectListStatus } from '@/types/projects';
 import type {
   ProjectDetail,
   ProjectDetailApiResponse,
@@ -29,13 +29,6 @@ function maybeThrowRandomError(message: string): void {
   }
 }
 
-function mapStatus(value: unknown): ProjectListStatus {
-  if (value === 'completed' || value === 'error' || value === 'archived' || value === 'draft') {
-    return value;
-  }
-  return 'draft';
-}
-
 function mapRunStatus(value: unknown): RunSummary['status'] {
   if (value === 'queued' || value === 'running' || value === 'completed' || value === 'failed') {
     return value;
@@ -44,12 +37,7 @@ function mapRunStatus(value: unknown): RunSummary['status'] {
 }
 
 function mapScenario(api: ScenarioSummaryApi): ScenarioSummary {
-  return {
-    id: api.id,
-    name: api.name,
-    updatedAt: api.updated_at ?? api.updatedAt ?? new Date().toISOString(),
-    isDefault: api.is_default ?? api.isDefault ?? false,
-  };
+  return mapScenarioSummary(api);
 }
 
 function mapRun(api: RunSummaryApi): RunSummary {
@@ -80,7 +68,7 @@ function mapProjectDetail(
   return {
     id: project.id,
     name: project.name,
-    status: mapStatus(project.status),
+    status: mapProjectStatus(project.status),
     updatedAt: project.updated_at ?? project.updatedAt ?? new Date().toISOString(),
     description: project.description ?? undefined,
     scenarios: scenarios.map((scenario) => ({
