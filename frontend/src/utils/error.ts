@@ -1,6 +1,11 @@
 import axios from 'axios';
+import { ApiError } from '@/api/errors';
 
 export function getErrorMessage(error: unknown, fallback = 'Произошла ошибка'): string {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
       | { message?: string; detail?: string; error?: string }
