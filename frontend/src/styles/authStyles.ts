@@ -1,26 +1,27 @@
-import { OZON } from '@/theme';
+import { LANDING, landingFont } from '@/landing/styles/tokens';
 
 export const AUTH_COLORS = {
-  primary: OZON.blue,
-  primaryHover: OZON.blue,
-  secondary: OZON.morningBlue,
-  text: OZON.darkSpace,
-  subtitle: 'rgba(0, 26, 52, 0.64)',
-  border: 'rgba(0, 26, 52, 0.20)',
-  footer: 'rgba(0, 26, 52, 0.44)',
-  overlay: 'rgba(0, 26, 52, 0.40)',
-  soft: 'rgba(0, 91, 255, 0.08)',
+  primary: LANDING.obsidian,
+  primaryHover: LANDING.graphite,
+  secondary: LANDING.ember,
+  text: LANDING.ink,
+  subtitle: LANDING.muted,
+  border: LANDING.border,
+  footer: LANDING.faint,
+  overlay: 'rgba(244, 244, 245, 0.72)',
+  soft: LANDING.paper,
 } as const;
 
-export const PILL_RADIUS = '999px';
+export const PILL_RADIUS = LANDING.radiusPill;
 
 export const AUTH_FIELD_HEIGHT = 52;
 
 export const pillFieldSx = {
   width: '100%',
+  fontFamily: landingFont,
   '& .MuiOutlinedInput-root': {
-    borderRadius: PILL_RADIUS,
-    backgroundColor: OZON.white,
+    borderRadius: LANDING.radiusButton,
+    backgroundColor: LANDING.snow,
     fontSize: '0.9375rem',
     minHeight: AUTH_FIELD_HEIGHT,
     width: '100%',
@@ -28,99 +29,104 @@ export const pillFieldSx = {
       borderColor: AUTH_COLORS.border,
     },
     '&:hover fieldset': {
-      borderColor: 'rgba(0, 91, 255, 0.56)',
+      borderColor: LANDING.ash,
     },
     '&.Mui-focused fieldset': {
       borderColor: AUTH_COLORS.primary,
       borderWidth: 1,
     },
     '&.Mui-error fieldset': {
-      borderColor: OZON.darkSpace,
-      borderWidth: 2,
+      borderColor: LANDING.ink,
+      borderWidth: 1.5,
     },
     '&.Mui-error': {
-      backgroundColor: 'rgba(0, 26, 52, 0.04)',
+      backgroundColor: LANDING.subtle,
     },
     '& input, & .MuiOutlinedInput-input': {
       py: 1.75,
-      px: 2.5,
+      px: 2.25,
       boxSizing: 'border-box',
-      color: OZON.darkSpace,
+      color: LANDING.ink,
       '&::placeholder': {
-        color: 'rgba(0, 26, 52, 0.44)',
+        color: LANDING.fog,
         opacity: 1,
       },
     },
   },
   '& .MuiFormHelperText-root': {
-    mx: 2.5,
+    mx: 1.5,
     mt: 0.75,
-    color: 'rgba(0, 26, 52, 0.64)',
+    color: LANDING.muted,
     '&.Mui-error': {
-      color: OZON.darkSpace,
+      color: LANDING.ink,
     },
   },
 };
 
 export const pillButtonSx = {
-  borderRadius: PILL_RADIUS,
+  borderRadius: LANDING.radiusButton,
   py: 1.75,
   minHeight: AUTH_FIELD_HEIGHT,
   width: '100%',
-  fontSize: '1rem',
-  fontWeight: 600,
+  fontSize: '0.9375rem',
+  fontWeight: 400,
   textTransform: 'none' as const,
-  boxShadow: 'none',
-  backgroundColor: AUTH_COLORS.primary,
-  color: OZON.white,
-  border: `1px solid ${AUTH_COLORS.primary}`,
+  backgroundColor: LANDING.obsidian,
+  color: LANDING.snow,
+  border: '1.5px solid #2c2e34',
+  boxShadow: LANDING.shadowPrimary,
   '&:hover': {
-    background: `linear-gradient(135deg, ${OZON.blue}, ${OZON.morningBlue})`,
-    boxShadow: 'none',
+    backgroundColor: LANDING.graphite,
+    boxShadow: LANDING.shadowPrimary,
   },
   '&:focus-visible': {
-    boxShadow: '0 0 0 4px rgba(0, 162, 255, 0.24)',
+    boxShadow: '0 0 0 4px rgba(9, 9, 11, 0.16)',
   },
   '&.Mui-disabled': {
-    backgroundColor: 'rgba(0, 91, 255, 0.32)',
-    color: 'rgba(255, 255, 255, 0.72)',
+    backgroundColor: LANDING.mist,
+    color: LANDING.fog,
+    borderColor: 'transparent',
+    boxShadow: 'none',
   },
 };
 
 export const authTitleSx = {
-  textAlign: 'center',
-  fontWeight: 700,
-  fontSize: { xs: '1.125rem', sm: '1.25rem' },
-  letterSpacing: '0.04em',
-  textTransform: 'uppercase',
-  color: AUTH_COLORS.primary,
-  lineHeight: 1.35,
-  mb: 1.5,
-  px: 3,
-};
-
-export const authSubtitleSx = {
-  textAlign: 'center',
-  fontSize: '0.875rem',
-  lineHeight: 1.55,
-  color: AUTH_COLORS.subtitle,
-  mb: 3.5,
+  textAlign: 'center' as const,
+  fontFamily: landingFont,
+  fontWeight: 600,
+  fontSize: { xs: '1.75rem', sm: '2rem' },
+  letterSpacing: '-0.02em',
+  textTransform: 'none' as const,
+  color: LANDING.ink,
+  lineHeight: 1.2,
+  mb: 1.25,
   px: 1,
 };
 
+export const authSubtitleSx = {
+  textAlign: 'center' as const,
+  fontSize: '0.9375rem',
+  lineHeight: 1.5,
+  color: AUTH_COLORS.subtitle,
+  mb: 3.5,
+  px: 1,
+  maxWidth: 420,
+  mx: 'auto',
+};
+
 export const authCardSx = {
-  position: 'relative',
+  position: 'relative' as const,
   zIndex: 1,
-  width: 'calc(100% - 32px)',
+  width: '100%',
   maxWidth: 440,
-  minWidth: 320,
-  boxSizing: 'border-box',
+  minWidth: 0,
+  boxSizing: 'border-box' as const,
   px: { xs: 3, sm: 4.5 },
   py: { xs: 4, sm: 5 },
-  borderRadius: '24px',
-  backgroundColor: OZON.white,
-  boxShadow: '0 20px 60px rgba(0, 26, 52, 0.16), 0 8px 24px rgba(0, 26, 52, 0.08)',
-  border: '1px solid rgba(0, 26, 52, 0.12)',
+  borderRadius: LANDING.radiusCard,
+  backgroundColor: LANDING.snow,
+  boxShadow: 'none',
+  border: `1px solid ${LANDING.border}`,
 };
 
 export const authCardWideSx = {
@@ -143,7 +149,7 @@ export const registerFieldsGridSx = {
 
 export const authFormSx = {
   display: 'flex',
-  flexDirection: 'column',
+  flexDirection: 'column' as const,
   gap: authFormGap,
   width: '100%',
 };

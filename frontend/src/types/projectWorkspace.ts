@@ -11,7 +11,7 @@ export interface ScenarioSummary {
 export interface RunSummary {
   id: string;
   name: string;
-  status: 'queued' | 'running' | 'completed' | 'failed';
+  status: 'queued' | 'running' | 'completed' | 'completed_with_warnings' | 'failed';
   createdAt: string;
   scenarioId: string;
 }
@@ -27,6 +27,8 @@ export interface ProjectDetail {
   defaultScenarioId: string | null;
   lastRun: RunSummary | null;
   notifications: Notification[];
+  myRole?: import('@/types/rbac').ProjectRole | null;
+  myRoleLabel?: string | null;
 }
 
 export interface ScenarioDetail {
@@ -45,6 +47,9 @@ export interface RunDetail {
   status: RunSummary['status'];
   createdAt: string;
   finishedAt?: string;
+  progress?: number;
+  result?: import('@/types/simulation').RunResult | null;
+  errorMessage?: string | null;
 }
 
 /** GET /api/v1/projects/{projectId} */
@@ -60,6 +65,10 @@ export interface ProjectDetailApiResponse {
   defaultScenarioId?: string | null;
   last_run?: RunSummaryApi | null;
   lastRun?: RunSummaryApi | null;
+  my_role?: string | null;
+  my_role_label?: string | null;
+  myRole?: string | null;
+  myRoleLabel?: string | null;
 }
 
 /** GET /api/v1/projects/{projectId}/scenarios */
