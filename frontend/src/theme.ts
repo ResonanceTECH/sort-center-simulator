@@ -1,82 +1,98 @@
 import { createTheme } from '@mui/material/styles';
+import { LANDING, landingFont } from '@/landing/styles/tokens';
 
-/** Only the four Ozon brand colors + allowed alpha variants. */
+/** @deprecated Use LANDING / theme palette. Kept so existing OZON.* imports keep working. */
 export const OZON = {
-  blue: '#005BFF',
-  darkSpace: '#001A34',
-  morningBlue: '#00A2FF',
-  white: '#FFFFFF',
+  blue: LANDING.obsidian,
+  darkSpace: LANDING.ink,
+  morningBlue: LANDING.steel,
+  white: LANDING.snow,
 } as const;
 
 export const SIDEBAR_WIDTH = 240;
+export const PAGE_MAX_WIDTH = LANDING.maxWidth;
 
 export const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: OZON.blue,
-      light: 'rgba(0, 91, 255, 0.08)',
-      dark: OZON.blue,
-      contrastText: OZON.white,
+      main: LANDING.obsidian,
+      light: LANDING.paper,
+      dark: LANDING.graphite,
+      contrastText: LANDING.snow,
     },
     secondary: {
-      main: OZON.morningBlue,
-      light: 'rgba(0, 162, 255, 0.10)',
-      dark: OZON.morningBlue,
-      contrastText: OZON.white,
+      main: LANDING.ember,
+      light: 'rgba(255, 90, 0, 0.10)',
+      dark: '#e04f00',
+      contrastText: LANDING.snow,
     },
     background: {
-      default: '#F5F7FA',
-      paper: OZON.white,
+      default: LANDING.canvas,
+      paper: LANDING.snow,
     },
     text: {
-      primary: OZON.darkSpace,
-      secondary: 'rgba(0, 26, 52, 0.64)',
-      disabled: 'rgba(0, 26, 52, 0.32)',
+      primary: LANDING.ink,
+      secondary: LANDING.muted,
+      disabled: LANDING.ash,
     },
-    divider: 'rgba(0, 26, 52, 0.12)',
+    divider: LANDING.border,
     action: {
-      hover: 'rgba(0, 162, 255, 0.08)',
-      selected: 'rgba(0, 91, 255, 0.10)',
-      disabled: 'rgba(0, 26, 52, 0.32)',
-      disabledBackground: 'rgba(0, 91, 255, 0.32)',
-      focus: 'rgba(0, 91, 255, 0.14)',
+      hover: 'rgba(9, 9, 11, 0.04)',
+      selected: 'rgba(9, 9, 11, 0.08)',
+      disabled: LANDING.ash,
+      disabledBackground: LANDING.cloud,
+      focus: 'rgba(9, 9, 11, 0.12)',
     },
-    // Remapped to palette — never red/green/yellow
     info: {
-      main: OZON.blue,
-      contrastText: OZON.white,
+      main: LANDING.obsidian,
+      contrastText: LANDING.snow,
     },
     success: {
-      main: OZON.morningBlue,
-      contrastText: OZON.white,
+      main: '#3f7d4e',
+      contrastText: LANDING.snow,
     },
     warning: {
-      main: OZON.darkSpace,
-      contrastText: OZON.white,
+      main: LANDING.ember,
+      contrastText: LANDING.snow,
     },
     error: {
-      main: OZON.darkSpace,
-      contrastText: OZON.white,
+      main: LANDING.ink,
+      contrastText: LANDING.snow,
     },
   },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 14 },
   typography: {
-    fontFamily: '"Inter", "Manrope", "Roboto", "Helvetica", "Arial", sans-serif',
-    h4: { fontWeight: 700, fontSize: '1.75rem', letterSpacing: '-0.02em', color: OZON.darkSpace },
-    h5: { fontWeight: 700, fontSize: '1.125rem', color: OZON.darkSpace },
-    h6: { fontWeight: 600, fontSize: '0.9375rem', color: OZON.darkSpace },
-    body1: { color: OZON.darkSpace },
-    body2: { fontSize: '0.8125rem', color: OZON.darkSpace },
-    caption: { fontSize: '0.75rem', color: 'rgba(0, 26, 52, 0.64)' },
-    button: { textTransform: 'none', fontWeight: 600 },
+    fontFamily: landingFont,
+    h4: {
+      fontWeight: 600,
+      fontSize: '1.75rem',
+      letterSpacing: '-0.02em',
+      color: LANDING.ink,
+    },
+    h5: {
+      fontWeight: 600,
+      fontSize: '1.125rem',
+      letterSpacing: '-0.02em',
+      color: LANDING.ink,
+    },
+    h6: {
+      fontWeight: 600,
+      fontSize: '0.9375rem',
+      color: LANDING.ink,
+    },
+    body1: { color: LANDING.body },
+    body2: { fontSize: '0.8125rem', color: LANDING.body },
+    caption: { fontSize: '0.75rem', color: LANDING.faint },
+    button: { textTransform: 'none', fontWeight: 500 },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#F5F7FA',
-          color: OZON.darkSpace,
+          backgroundColor: LANDING.canvas,
+          color: LANDING.ink,
+          fontFamily: landingFont,
         },
       },
     },
@@ -86,41 +102,45 @@ export const theme = createTheme({
       },
       styleOverrides: {
         root: {
-          borderRadius: 10,
+          borderRadius: LANDING.radiusButton,
           boxShadow: 'none',
+          fontWeight: 400,
           '&:hover': { boxShadow: 'none' },
         },
         containedPrimary: {
-          backgroundColor: OZON.blue,
-          color: OZON.white,
-          border: `1px solid ${OZON.blue}`,
+          backgroundColor: LANDING.obsidian,
+          color: LANDING.snow,
+          border: '1.5px solid #2c2e34',
+          boxShadow: LANDING.shadowPrimary,
           '&:hover': {
-            background: `linear-gradient(135deg, ${OZON.blue}, ${OZON.morningBlue})`,
-            borderColor: OZON.blue,
+            backgroundColor: LANDING.graphite,
+            boxShadow: LANDING.shadowPrimary,
+            borderColor: '#2c2e34',
           },
           '&:focus-visible': {
-            boxShadow: '0 0 0 4px rgba(0, 162, 255, 0.24)',
+            boxShadow: `0 0 0 4px rgba(9, 9, 11, 0.16)`,
           },
           '&.Mui-disabled': {
-            backgroundColor: 'rgba(0, 91, 255, 0.32)',
-            color: 'rgba(255, 255, 255, 0.72)',
+            backgroundColor: LANDING.mist,
+            color: LANDING.fog,
             borderColor: 'transparent',
+            boxShadow: 'none',
           },
         },
         outlinedPrimary: {
-          backgroundColor: OZON.white,
-          color: OZON.blue,
-          border: `1px solid ${OZON.blue}`,
+          backgroundColor: LANDING.snow,
+          color: LANDING.iron,
+          border: `1px solid ${LANDING.iron}`,
           '&:hover': {
-            backgroundColor: 'rgba(0, 91, 255, 0.08)',
-            borderColor: OZON.blue,
+            backgroundColor: LANDING.subtle,
+            borderColor: LANDING.iron,
           },
         },
         text: {
-          color: OZON.darkSpace,
+          color: LANDING.body,
           '&:hover': {
-            backgroundColor: 'rgba(0, 162, 255, 0.08)',
-            color: OZON.blue,
+            backgroundColor: LANDING.paper,
+            color: LANDING.ink,
           },
         },
       },
@@ -128,8 +148,8 @@ export const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          border: '1px solid rgba(0, 26, 52, 0.12)',
+          borderRadius: 20,
+          border: `1px solid ${LANDING.border}`,
           boxShadow: 'none',
           backgroundImage: 'none',
         },
@@ -138,11 +158,11 @@ export const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          border: '1px solid rgba(0, 26, 52, 0.12)',
+          borderRadius: 20,
+          border: `1px solid ${LANDING.border}`,
           boxShadow: 'none',
           '&:hover': {
-            borderColor: 'rgba(0, 91, 255, 0.32)',
+            borderColor: LANDING.mist,
             boxShadow: 'none',
           },
         },
@@ -151,42 +171,43 @@ export const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: OZON.white,
-          color: OZON.darkSpace,
+          backgroundColor: LANDING.snow,
+          color: LANDING.ink,
           boxShadow: 'none',
-          borderBottom: '1px solid rgba(0, 26, 52, 0.12)',
+          borderBottom: `1px solid ${LANDING.border}`,
         },
       },
     },
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          backgroundColor: OZON.white,
-          color: OZON.darkSpace,
+          backgroundColor: LANDING.snow,
+          color: LANDING.ink,
+          borderRadius: LANDING.radiusButton,
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(0, 26, 52, 0.20)',
+            borderColor: LANDING.border,
           },
           '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(0, 91, 255, 0.56)',
+            borderColor: LANDING.ash,
           },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: OZON.blue,
+            borderColor: LANDING.obsidian,
             borderWidth: 1,
           },
           '&.Mui-focused': {
-            boxShadow: '0 0 0 3px rgba(0, 91, 255, 0.14)',
+            boxShadow: '0 0 0 3px rgba(9, 9, 11, 0.08)',
           },
           '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-            borderColor: OZON.darkSpace,
-            borderWidth: 2,
+            borderColor: LANDING.ink,
+            borderWidth: 1.5,
           },
           '&.Mui-error': {
-            backgroundColor: 'rgba(0, 26, 52, 0.04)',
+            backgroundColor: LANDING.subtle,
           },
         },
         input: {
           '&::placeholder': {
-            color: 'rgba(0, 26, 52, 0.44)',
+            color: LANDING.fog,
             opacity: 1,
           },
         },
@@ -195,9 +216,9 @@ export const theme = createTheme({
     MuiFormHelperText: {
       styleOverrides: {
         root: {
-          color: 'rgba(0, 26, 52, 0.64)',
+          color: LANDING.muted,
           '&.Mui-error': {
-            color: OZON.darkSpace,
+            color: LANDING.ink,
           },
         },
       },
@@ -205,17 +226,17 @@ export const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderColor: 'rgba(0, 26, 52, 0.10)',
+          borderColor: LANDING.border,
           fontSize: '0.8125rem',
-          color: OZON.darkSpace,
+          color: LANDING.body,
           py: 1.25,
         },
         head: {
           fontWeight: 600,
-          color: OZON.darkSpace,
+          color: LANDING.ink,
           fontSize: '0.75rem',
-          backgroundColor: 'rgba(0, 91, 255, 0.06)',
-          borderBottom: '1px solid rgba(0, 26, 52, 0.12)',
+          backgroundColor: LANDING.subtle,
+          borderBottom: `1px solid ${LANDING.border}`,
         },
       },
     },
@@ -223,7 +244,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: 'rgba(0, 162, 255, 0.06)',
+            backgroundColor: LANDING.paper,
           },
         },
       },
@@ -231,52 +252,56 @@ export const theme = createTheme({
     MuiCheckbox: {
       styleOverrides: {
         root: {
-          color: 'rgba(0, 26, 52, 0.44)',
-          '&.Mui-checked': { color: OZON.blue },
+          color: LANDING.ash,
+          '&.Mui-checked': { color: LANDING.obsidian },
         },
       },
     },
     MuiRadio: {
       styleOverrides: {
         root: {
-          color: 'rgba(0, 26, 52, 0.44)',
-          '&.Mui-checked': { color: OZON.blue },
+          color: LANDING.ash,
+          '&.Mui-checked': { color: LANDING.obsidian },
         },
       },
     },
     MuiSwitch: {
       styleOverrides: {
         switchBase: {
-          '&.Mui-checked': { color: OZON.blue },
-          '&.Mui-checked + .MuiSwitch-track': { backgroundColor: OZON.blue },
+          '&.Mui-checked': { color: LANDING.obsidian },
+          '&.Mui-checked + .MuiSwitch-track': { backgroundColor: LANDING.obsidian },
         },
-        track: { backgroundColor: 'rgba(0, 91, 255, 0.12)' },
+        track: { backgroundColor: LANDING.mist },
       },
     },
     MuiLinearProgress: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgba(0, 91, 255, 0.12)',
+          backgroundColor: LANDING.cloud,
         },
         bar: {
-          backgroundColor: OZON.blue,
+          backgroundColor: LANDING.obsidian,
         },
       },
     },
     MuiLink: {
       styleOverrides: {
         root: {
-          color: OZON.blue,
+          color: LANDING.ink,
+          textDecorationColor: LANDING.mist,
+          '&:hover': {
+            color: LANDING.ember,
+          },
         },
       },
     },
     MuiIconButton: {
       styleOverrides: {
         root: {
-          color: OZON.darkSpace,
+          color: LANDING.body,
           '&:hover': {
-            backgroundColor: 'rgba(0, 91, 255, 0.08)',
-            color: OZON.blue,
+            backgroundColor: LANDING.paper,
+            color: LANDING.ink,
           },
         },
       },
@@ -284,101 +309,122 @@ export const theme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          border: '1px solid rgba(0, 26, 52, 0.12)',
-          boxShadow: '0 8px 24px rgba(0, 26, 52, 0.12)',
+          border: `1px solid ${LANDING.border}`,
+          boxShadow: '0 12px 32px rgba(9, 9, 11, 0.10)',
+          borderRadius: 14,
         },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundColor: OZON.white,
-          border: '1px solid rgba(0, 26, 52, 0.12)',
-          boxShadow: '0 16px 40px rgba(0, 26, 52, 0.16)',
+          backgroundColor: LANDING.snow,
+          border: `1px solid ${LANDING.border}`,
+          boxShadow: '0 16px 40px rgba(9, 9, 11, 0.12)',
+          borderRadius: 20,
         },
       },
     },
     MuiBackdrop: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgba(0, 26, 52, 0.56)',
+          backgroundColor: 'rgba(9, 9, 11, 0.48)',
         },
       },
     },
     MuiAlert: {
       styleOverrides: {
         filledInfo: {
-          backgroundColor: OZON.blue,
-          color: OZON.white,
+          backgroundColor: LANDING.obsidian,
+          color: LANDING.snow,
         },
         filledSuccess: {
-          backgroundColor: OZON.morningBlue,
-          color: OZON.white,
+          backgroundColor: '#3f7d4e',
+          color: LANDING.snow,
         },
         filledWarning: {
-          backgroundColor: OZON.darkSpace,
-          color: OZON.white,
+          backgroundColor: LANDING.ember,
+          color: LANDING.snow,
         },
         filledError: {
-          backgroundColor: OZON.darkSpace,
-          color: OZON.white,
+          backgroundColor: LANDING.ink,
+          color: LANDING.snow,
         },
         standardError: {
-          backgroundColor: 'rgba(0, 26, 52, 0.10)',
-          color: OZON.darkSpace,
-          border: `1px solid ${OZON.darkSpace}`,
-          '& .MuiAlert-icon': { color: OZON.darkSpace },
+          backgroundColor: LANDING.paper,
+          color: LANDING.ink,
+          border: `1px solid ${LANDING.mist}`,
+          '& .MuiAlert-icon': { color: LANDING.ink },
         },
         standardSuccess: {
-          backgroundColor: 'rgba(0, 162, 255, 0.10)',
-          color: OZON.darkSpace,
-          border: `1px solid ${OZON.morningBlue}`,
-          '& .MuiAlert-icon': { color: OZON.morningBlue },
+          backgroundColor: '#f0f7f2',
+          color: LANDING.ink,
+          border: '1px solid #c5dbc9',
+          '& .MuiAlert-icon': { color: '#3f7d4e' },
         },
         standardInfo: {
-          backgroundColor: 'rgba(0, 91, 255, 0.10)',
-          color: OZON.darkSpace,
-          border: `1px solid ${OZON.blue}`,
-          '& .MuiAlert-icon': { color: OZON.blue },
+          backgroundColor: LANDING.paper,
+          color: LANDING.ink,
+          border: `1px solid ${LANDING.border}`,
+          '& .MuiAlert-icon': { color: LANDING.obsidian },
         },
         standardWarning: {
-          backgroundColor: 'rgba(0, 26, 52, 0.10)',
-          color: OZON.darkSpace,
-          border: `1px solid ${OZON.darkSpace}`,
-          '& .MuiAlert-icon': { color: OZON.darkSpace },
+          backgroundColor: 'rgba(255, 90, 0, 0.08)',
+          color: LANDING.ink,
+          border: '1px solid rgba(255, 90, 0, 0.28)',
+          '& .MuiAlert-icon': { color: LANDING.ember },
         },
       },
     },
     MuiBadge: {
       styleOverrides: {
         colorError: {
-          backgroundColor: OZON.blue,
-          color: OZON.white,
+          backgroundColor: LANDING.ember,
+          color: LANDING.snow,
         },
         colorPrimary: {
-          backgroundColor: OZON.blue,
-          color: OZON.white,
+          backgroundColor: LANDING.obsidian,
+          color: LANDING.snow,
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          color: OZON.darkSpace,
+          color: LANDING.body,
+          borderRadius: LANDING.radiusBadge,
         },
         colorPrimary: {
-          backgroundColor: 'rgba(0, 91, 255, 0.10)',
-          color: OZON.blue,
+          backgroundColor: LANDING.paper,
+          color: LANDING.ink,
         },
         outlined: {
-          borderColor: 'rgba(0, 26, 52, 0.24)',
+          borderColor: LANDING.border,
         },
       },
     },
     MuiSkeleton: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgba(0, 91, 255, 0.08)',
+          backgroundColor: LANDING.cloud,
+        },
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: {
+          backgroundColor: LANDING.obsidian,
+          height: 2,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          color: LANDING.muted,
+          '&.Mui-selected': {
+            color: LANDING.ink,
+          },
         },
       },
     },
