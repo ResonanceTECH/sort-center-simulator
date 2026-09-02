@@ -10,7 +10,6 @@ import {
   Paper,
   Select,
   Stack,
-  Typography,
 } from '@mui/material';
 import PlayArrowOutlined from '@mui/icons-material/PlayArrowOutlined';
 import ScienceOutlined from '@mui/icons-material/ScienceOutlined';
