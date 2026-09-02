@@ -1,12 +1,12 @@
 export const STATS = [
-  { value: '8', label: 'экранов\nв workspace' },
-  { value: 'A/B', label: 'сравнение\nсценариев' },
-  { value: '2D', label: 'редактор\nlayout СЦ' },
+  { value: '3', label: 'уровня\nуправления' },
+  { value: '7', label: 'шагов\nцикла решений' },
+  { value: '1', label: 'единое окно\nцепочки' },
 ] as const;
 
 export const BOTTOM_NAV = [
   { id: 'hero', label: 'Главная', href: '#hero' },
-  { id: 'workflow', label: 'Процесс', href: '#workflow' },
+  { id: 'workflow', label: 'Цикл', href: '#workflow' },
   { id: 'screens', label: 'Экраны', href: '#screens' },
 ] as const;
 
@@ -16,40 +16,40 @@ export const BOTTOM_NAV_CTA = {
 } as const;
 
 export const DARK_FEATURES = {
-  title: 'Что решает платформа',
+  title: 'Три уровня — один контур управления',
   items: [
-    'Layout без Excel и чертежей на коленке',
-    'Пропускная способность до запуска на объекте',
-    'Сравнение сценариев по одним KPI',
-    'Командная работа с RBAC и ролями',
+    'Strategic — Supply Network, поставщики, resilience и what-if сети',
+    'Tactical — прогноз спроса, supply, inventory и transport planning',
+    'Operational — Control Tower, shipments, exceptions и incidents',
+    'Замкнутый цикл: факт исполнения возвращается в планирование',
   ],
-  cta: 'Создать проект',
+  cta: 'Открыть Control Tower',
 } as const;
 
 export const MARQUEE_ITEMS = [
-  'Layout',
-  'Simulation',
-  'Trace',
-  'Throughput',
-  'A/B Compare',
-  'RBAC',
-  '2D Editor',
-  'Metrics',
+  'Control Tower',
+  'Supply Network',
+  'Demand Forecast',
+  'Exceptions',
+  'Predictive ETA',
+  'What-if',
+  'Impact Analysis',
+  'Replan',
 ] as const;
 
 export const SOCIAL_PROOF = {
-  title: 'Почему команды выбирают симулятор',
-  features: ['Layout', 'Simulation', 'Trace', 'Throughput', 'Metrics'],
+  title: 'Почему выбирают SupplyTwin',
+  features: ['Control Tower', 'Scenarios', 'ETA', 'Exceptions', 'Network'],
 } as const;
 
 export const HERO = {
   id: 'hero',
-  brandName: 'Sort Center',
-  headlineLine1: 'Цифровая модель',
-  headlineLine2: 'сортировочного центра.',
+  brandName: 'SupplyTwin',
+  headlineLine1: 'Цифровой двойник',
+  headlineLine2: 'цепочки поставок.',
   subtitle:
-    'Проектирование layout, расчёт пропускной способности и сравнение сценариев — для инженеров и команд проектирования СЦ.',
-  ctaPrimary: 'Создать проект',
+    'Стратегия, планирование и операционный контроль в одном пространстве. Видите риск до срыва SLA — проверяйте решения через what-if сценарии.',
+  ctaPrimary: 'Начать',
   ctaSecondary: 'Войти',
 } as const;
 
@@ -57,36 +57,36 @@ export const PRODUCT = {
   id: 'product',
   pitch: {
     title: 'Что это',
-    body: 'Sort Center Simulator — цифровая модель сортировочного центра. Собираете схему в редакторе, задаёте потоки и SKU, запускаете расчёт или симуляцию и сравниваете прогоны по одним метрикам.',
-    audience: 'Для инженеров layout, аналитиков процессов и команд проектирования СЦ.',
+    body: 'SupplyTwin объединяет данные из ERP, TMS, WMS и Excel в единую модель цепочки поставок. Платформа не заканчивается на точке на карте — связывает событие с бизнес-влиянием и вариантами решения.',
+    audience: 'Для SCM managers, логистов, planners, закупок и руководителей транспортной логистики.',
   },
   capabilities: [
     {
-      id: 'editor',
-      title: '2D-редактор',
-      text: 'Зоны, конвейеры, буферы и точки входа — layout в одном проекте.',
-      tags: ['Layout', 'Зоны', 'Конвейеры'],
+      id: 'control-tower',
+      title: 'Control Tower',
+      text: 'Live map, predictive ETA и очередь исключений — что происходит с цепочкой прямо сейчас.',
+      tags: ['OTIF', 'ETA', 'Exceptions'],
       image: '/images/project-plan-1.svg',
     },
     {
-      id: 'simulation',
-      title: 'Расчёт и симуляция',
-      text: 'Аналитика или имитационный прогон с trace-событиями.',
-      tags: ['Trace', 'Physics', 'Events'],
+      id: 'planning',
+      title: 'Planning',
+      text: 'Demand forecast преобразуется в supply, inventory и transport plan с контролем мощностей.',
+      tags: ['Demand', 'Supply', 'Inventory'],
       lottie: '/landing/lottie/workflow.json',
     },
     {
-      id: 'analytics',
-      title: 'Метрики и узкие места',
-      text: 'Throughput, очереди и загрузка зон на dashboard.',
-      tags: ['Throughput', 'Queues', 'KPI'],
+      id: 'impact',
+      title: 'Impact Analysis',
+      text: 'Задержка поставки → SKU → запасы → stockout risk → затронутые заказы клиентов.',
+      tags: ['SKU', 'Stockout', 'SLA'],
       lottie: '/landing/lottie/analytics.json',
     },
     {
-      id: 'compare',
-      title: 'Сравнение сценариев',
-      text: 'Два прогона — одни KPI. Выбираете лучший вариант layout или режима.',
-      tags: ['A/B', 'Compare', 'Decision'],
+      id: 'scenarios',
+      title: 'Scenario Engine',
+      text: 'What-if моделирование: сравнение сценариев по OTIF, cost и stockout risk с рекомендацией.',
+      tags: ['What-if', 'Compare', 'Decision'],
       image: '/images/project-plan-4.svg',
     },
   ],
@@ -94,36 +94,36 @@ export const PRODUCT = {
 
 export const SCREENS = {
   id: 'screens',
-  title: 'Экраны приложения',
-  subtitle: 'Проекты, редактор, прогоны и аналитика — в единой навигации.',
+  title: 'Экраны платформы',
+  subtitle: 'Control Tower, планирование, поставки и сценарии — в единой навигации.',
   items: [
-    { title: 'Проекты', image: '/images/project-thumb-1.svg' },
-    { title: 'Редактор layout', image: '/images/project-plan-1.svg' },
-    { title: 'Параметры', image: '/images/project-plan-2.svg' },
-    { title: 'Симуляция', image: '/images/project-plan-3.svg' },
-    { title: 'Статистика', image: '/images/project-thumb-2.svg' },
-    { title: 'Сравнение', image: '/images/project-plan-4.svg' },
-    { title: 'Прогоны', image: '/images/project-thumb-3.svg' },
-    { title: 'Визуализация', image: '/images/project-plan-5.svg' },
+    { title: 'Control Tower', image: '/images/project-thumb-1.svg' },
+    { title: 'Supply Network', image: '/images/project-plan-1.svg' },
+    { title: 'Demand & Supply Plan', image: '/images/project-plan-2.svg' },
+    { title: 'Inventory Plan', image: '/images/project-plan-3.svg' },
+    { title: 'Shipments', image: '/images/project-thumb-2.svg' },
+    { title: 'Exceptions', image: '/images/project-plan-4.svg' },
+    { title: 'Scenario Engine', image: '/images/project-thumb-3.svg' },
+    { title: 'Analytics', image: '/images/project-plan-5.svg' },
   ],
 } as const;
 
 export const FLOW = {
   id: 'flow',
   title: 'Как работает',
-  subtitle: 'От схемы до решения — в одном рабочем пространстве.',
+  subtitle: 'От мониторинга сети до управленческого решения — в одном цикле.',
   steps: [
-    { title: 'Схема', text: 'Layout СЦ в 2D-редакторе', image: '/images/project-plan-1.svg' },
-    { title: 'Параметры', text: 'Потоки, SKU, правила маршрутизации', image: '/images/project-plan-2.svg' },
-    { title: 'Прогон', text: 'Расчёт или симуляция с trace', image: '/images/project-plan-3.svg' },
-    { title: 'Решение', text: 'Статистика и сравнение вариантов', image: '/images/project-plan-4.svg' },
+    { title: 'Monitor', text: 'Единая картина сети и поставок', image: '/images/project-plan-1.svg' },
+    { title: 'Predict', text: 'Прогноз спроса, ETA и отклонений', image: '/images/project-plan-2.svg' },
+    { title: 'Detect', text: 'Очередь исключений и SLA-риски', image: '/images/project-plan-3.svg' },
+    { title: 'Decide', text: 'Сценарии, сравнение KPI и replan', image: '/images/project-plan-4.svg' },
   ],
 } as const;
 
 export const CTA = {
   id: 'cta',
-  title: 'Протестируйте свой сценарий',
-  subtitle: 'Демо-данные уже в системе — первый проект за несколько минут.',
+  title: 'Увидьте риск до того, как он станет инцидентом',
+  subtitle: 'Демо-данные уже в системе — Control Tower за пару минут.',
   primary: 'Начать',
   secondary: 'Демо-вход',
 } as const;

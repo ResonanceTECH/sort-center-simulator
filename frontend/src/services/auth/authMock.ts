@@ -1,4 +1,4 @@
-import { DEMO_USER } from '@/mocks/authData';
+import { DEMO_USERS } from '@/mocks/authData';
 import { delay } from '@/utils/error';
 import type {
   AuthResponse,
@@ -22,17 +22,19 @@ function maybeThrowRandomError(): void {
 function getStoredUsers(): StoredUser[] {
   const raw = localStorage.getItem(USERS_KEY);
   if (!raw) {
-    const initial = [DEMO_USER];
-    localStorage.setItem(USERS_KEY, JSON.stringify(initial));
-    return initial;
+    localStorage.setItem(USERS_KEY, JSON.stringify(DEMO_USERS));
+    return DEMO_USERS;
   }
 
   try {
-    return JSON.parse(raw) as StoredUser[];
+    const parsed = JSON.parse(raw) as StoredUser[];
+    return parsed.map((user) => ({
+      ...user,
+      role: user.role ?? 'SUPPLY_CHAIN_MANAGER',
+    }));
   } catch {
-    const initial = [DEMO_USER];
-    localStorage.setItem(USERS_KEY, JSON.stringify(initial));
-    return initial;
+    localStorage.setItem(USERS_KEY, JSON.stringify(DEMO_USERS));
+    return DEMO_USERS;
   }
 }
 
@@ -46,6 +48,8 @@ function toPublicUser(user: StoredUser): User {
     name: user.name,
     email: user.email,
     team: user.team,
+    role: user.role,
+    organization: user.organization,
   };
 }
 
@@ -97,6 +101,8 @@ export async function registerMock(data: RegisterData): Promise<AuthResponse> {
     email: data.email.toLowerCase().trim(),
     password: data.password,
     team: data.team?.trim() || undefined,
+    role: 'SUPPLY_PLANNER',
+    organization: 'Logus Nova',
   };
 
   saveUsers([...users, newUser]);

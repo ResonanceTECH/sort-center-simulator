@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Link,
 } from '@mui/material';
+import { COMMON } from '@/constants/platformRu';
 import { AuthLayout } from '@/components/AuthLayout';
 import { AuthForm } from '@/components/AuthForm';
 import { AuthTextField } from '@/components/AuthTextField';
@@ -78,7 +79,7 @@ export function ForgotPassword() {
             render={({ field }) => (
               <AuthTextField
                 {...field}
-                placeholder="Email"
+                placeholder={COMMON.email}
                 type="email"
                 autoComplete="email"
                 error={Boolean(errors.email)}

@@ -1,9 +1,9 @@
 export const FOOTER_CONTENT = {
   contact: {
     title: 'Связаться',
-    address: 'Logus Nova · кейс проектирования СЦ',
+    address: 'SupplyTwin · B2B supply chain platform',
     phone: '+7 (000) 000-00-00',
-    email: 'support@sort-center.local',
+    email: 'support@supplytwin.local',
   },
   stack: {
     title: 'Стек',
@@ -12,7 +12,7 @@ export const FOOTER_CONTENT = {
     {
       title: 'Платформа',
       links: [
-        { label: 'Процесс', href: '#workflow' },
+        { label: 'Цикл', href: '#workflow' },
         { label: 'Экраны', href: '#screens' },
         { label: 'Возможности', href: '#social-proof' },
         { label: 'FAQ', href: '#faq' },
@@ -25,13 +25,13 @@ export const FOOTER_CONTENT = {
       links: [
         { label: 'Документация API', href: 'http://localhost:8000/docs' },
         { label: 'UI Kit', href: '/ui-kit' },
-        { label: 'Демо-проект', href: '/register' },
+        { label: 'Демо-доступ', href: '/register' },
         { label: 'GitHub', href: '#' },
-        { label: 'Logus Nova', href: '#hero' },
+        { label: 'SupplyTwin', href: '#hero' },
       ],
     },
   ],
-  brandWord: 'Sort Center',
+  brandWord: 'SupplyTwin',
 } as const;
 
 export const FOOTER_SOCIAL = [

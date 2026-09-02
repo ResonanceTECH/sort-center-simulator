@@ -3,16 +3,18 @@ import { Box } from '@mui/material';
 import { Sidebar } from '@/components/general/Sidebar';
 import { LANDING } from '@/landing/styles/tokens';
 import { PAGE_MAX_WIDTH, SIDEBAR_WIDTH } from '@/theme';
+import type { AppShell } from '@/types/scm/roles';
 
 interface AppLayoutProps {
   children: ReactNode;
   topBar: ReactNode;
+  shell?: AppShell;
 }
 
-export function AppLayout({ children, topBar }: AppLayoutProps) {
+export function AppLayout({ children, topBar, shell = 'internal' }: AppLayoutProps) {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: LANDING.canvas }}>
-      <Sidebar />
+      <Sidebar shell={shell} />
       <Box
         sx={{
           flex: 1,

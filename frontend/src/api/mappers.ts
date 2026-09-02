@@ -39,6 +39,8 @@ export function mapUser(dto: UserApiResponse): User {
     name: dto.name,
     email: dto.email,
     team: dto.team,
+    role: dto.role ?? 'SUPPLY_CHAIN_MANAGER',
+    organization: dto.organization,
   };
 }
 

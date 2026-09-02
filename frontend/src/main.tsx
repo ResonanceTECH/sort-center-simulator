@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { App } from '@/App';
+import { AppProviders } from '@/app/AppProviders';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AppSnackbar } from '@/components/shared/AppSnackbar';
 import { AuthProvider } from '@/context/AuthProvider';
@@ -20,12 +21,14 @@ createRoot(rootElement).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <AuthProvider>
-          <ErrorBoundary>
-            <App />
-            <AppSnackbar />
-          </ErrorBoundary>
-        </AuthProvider>
+        <AppProviders>
+          <AuthProvider>
+            <ErrorBoundary>
+              <App />
+              <AppSnackbar />
+            </ErrorBoundary>
+          </AuthProvider>
+        </AppProviders>
       </BrowserRouter>
     </ThemeProvider>
   </StrictMode>,

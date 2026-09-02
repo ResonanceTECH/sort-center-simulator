@@ -138,7 +138,7 @@ export function AuthLayout({
             '&:hover': { color: LANDING.ember },
           }}
         >
-          Конструктор СЦ
+          SupplyTwin
         </Typography>
         <IconButton
           aria-label="Закрыть"
