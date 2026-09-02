@@ -1,4 +1,5 @@
 import { Box, Link, Typography } from '@mui/material';
+import { LANDING } from '@/landing/styles/tokens';
 
 interface SectionHeaderProps {
   title: string;
@@ -9,7 +10,14 @@ interface SectionHeaderProps {
 export function SectionHeader({ title, actionLabel, onAction }: SectionHeaderProps) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-      <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '0.9375rem' }}>
+      <Typography
+        sx={{
+          fontWeight: 600,
+          fontSize: '0.9375rem',
+          letterSpacing: '-0.01em',
+          color: LANDING.ink,
+        }}
+      >
         {title}
       </Typography>
       {actionLabel && (
@@ -17,7 +25,12 @@ export function SectionHeader({ title, actionLabel, onAction }: SectionHeaderPro
           component="button"
           variant="body2"
           onClick={onAction}
-          sx={{ color: 'primary.main', fontWeight: 500, fontSize: '0.8125rem' }}
+          sx={{
+            color: LANDING.muted,
+            fontWeight: 400,
+            fontSize: '0.8125rem',
+            '&:hover': { color: LANDING.ember },
+          }}
         >
           {actionLabel}
         </Link>
