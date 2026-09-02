@@ -9,7 +9,7 @@ import {
 } from '@/constants/projectNav';
 import { PROJECTS_PAGE } from '@/constants/projects';
 import { useProjectContext } from '@/context/projectContext';
-import { OZON } from '@/theme';
+import { LANDING } from '@/landing/styles/tokens';
 
 export function ProjectNav() {
   const { project, access } = useProjectContext();
@@ -46,16 +46,25 @@ export function ProjectNav() {
               alignItems: 'center',
               gap: 0.5,
               mb: 1,
-              color: 'text.secondary',
+              color: LANDING.muted,
               textDecoration: 'none',
-              '&:hover': { color: OZON.blue },
+              '&:hover': { color: LANDING.ember },
             }}
           >
             <ArrowBack sx={{ fontSize: 16 }} />
             К проектам
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5 }}>
-            <Typography variant="h4" fontWeight={700} sx={{ lineHeight: 1.2 }}>
+            <Typography
+              component="h1"
+              sx={{
+                fontSize: { xs: '1.5rem', md: '1.75rem' },
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                color: LANDING.ink,
+                lineHeight: 1.2,
+              }}
+            >
               {project.name}
             </Typography>
             <ProjectStatusBadge status={project.status} />
@@ -64,7 +73,7 @@ export function ProjectNav() {
                 label={access.roleLabel}
                 size="small"
                 variant="outlined"
-                sx={{ fontWeight: 600 }}
+                sx={{ fontWeight: 500 }}
               />
             )}
           </Box>
@@ -96,7 +105,7 @@ export function ProjectNav() {
                 value={tabs.findIndex((item) => item.id === tab.id)}
                 disabled={disabled}
                 aria-current={activeTab?.id === tab.id ? 'page' : undefined}
-                sx={{ minHeight: 44, textTransform: 'none', fontWeight: 600 }}
+                sx={{ minHeight: 44, textTransform: 'none', fontWeight: 500 }}
               />
             );
 

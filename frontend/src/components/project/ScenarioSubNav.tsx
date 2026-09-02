@@ -3,6 +3,7 @@ import { Box, Chip, Tab, Tabs, Typography } from '@mui/material';
 import { useProjectContext } from '@/context/projectContext';
 import { PROJECTS_PAGE } from '@/constants/projects';
 import { can } from '@/constants/permissions';
+import { LANDING } from '@/landing/styles/tokens';
 
 interface ScenarioSubTab {
   label: string;
@@ -48,10 +49,10 @@ export function ScenarioSubNav() {
     <Box
       sx={{
         mb: 3,
-        p: 2,
-        borderRadius: 2,
+        p: 2.5,
+        borderRadius: LANDING.radiusCard,
         border: `1px solid ${PROJECTS_PAGE.border}`,
-        bgcolor: 'background.paper',
+        bgcolor: LANDING.snow,
       }}
     >
       <Box
@@ -63,14 +64,21 @@ export function ScenarioSubNav() {
           mb: 1.5,
         }}
       >
-        <Typography variant="subtitle2" color="text.secondary">
+        <Typography variant="subtitle2" sx={{ color: LANDING.muted }}>
           Сценарий
         </Typography>
-        <Typography variant="subtitle1" fontWeight={700}>
+        <Typography
+          sx={{
+            fontWeight: 600,
+            fontSize: '1rem',
+            letterSpacing: '-0.02em',
+            color: LANDING.ink,
+          }}
+        >
           {scenario?.name ?? scenarioId}
         </Typography>
         {scenario?.isDefault && (
-          <Chip label="По умолчанию" size="small" color="primary" variant="outlined" />
+          <Chip label="По умолчанию" size="small" variant="outlined" sx={{ fontWeight: 500 }} />
         )}
       </Box>
       <Tabs
@@ -87,7 +95,7 @@ export function ScenarioSubNav() {
             to={tab.path}
             label={tab.label}
             value={index}
-            sx={{ minHeight: 40, textTransform: 'none', fontWeight: 600 }}
+            sx={{ minHeight: 40, textTransform: 'none', fontWeight: 500 }}
           />
         ))}
       </Tabs>
