@@ -45,8 +45,8 @@ export const REPORT_STATUS_CONFIG: Record<
   processing: {
     label: 'Формируется',
     color: PROJECTS_PAGE.warning,
-    bg: '#FFFAEB',
-    border: '#FEDF89',
+    bg: 'rgba(255, 90, 0, 0.08)',
+    border: 'rgba(255, 90, 0, 0.28)',
   },
   failed: {
     label: 'Ошибка',
@@ -56,7 +56,7 @@ export const REPORT_STATUS_CONFIG: Record<
   },
   expired: {
     label: 'Истёк',
-    color: '#667085',
+    color: '#71717a',
     bg: PROJECTS_PAGE.draftBg,
     border: PROJECTS_PAGE.border,
   },

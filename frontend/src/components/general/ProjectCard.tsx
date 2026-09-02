@@ -6,6 +6,7 @@ import { MoreVert } from '@mui/icons-material';
 import { PROJECT_STATUS_LABELS } from '@/constants/general';
 import { StatusDot } from '@/components/general/StatusDot';
 import { useUiStore } from '@/store/uiStore';
+import { LANDING } from '@/landing/styles/tokens';
 import type { Project } from '@/types/general';
 
 interface ProjectCardProps {
@@ -28,10 +29,11 @@ function ProjectCardComponent({ project }: ProjectCardProps) {
       sx={{
         overflow: 'hidden',
         transition: 'border-color 0.2s',
-        border: '1px solid rgba(0, 26, 52, 0.12)',
+        border: `1px solid ${LANDING.border}`,
         boxShadow: 'none',
+        borderRadius: 2.5,
         '&:hover': {
-          borderColor: 'rgba(0, 91, 255, 0.32)',
+          borderColor: LANDING.mist,
         },
       }}
     >
@@ -43,12 +45,12 @@ function ProjectCardComponent({ project }: ProjectCardProps) {
           width: '100%',
           height: 100,
           objectFit: 'cover',
-          bgcolor: 'rgba(0, 91, 255, 0.06)',
+          bgcolor: 'rgba(9, 9, 11, 0.04)',
         }}
       />
       <Box sx={{ p: 1.5 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Typography variant="body2" fontWeight={700} mb={0.75} fontSize="0.8125rem">
+          <Typography variant="body2" fontWeight={600} mb={0.75} fontSize="0.8125rem">
             {project.name}
           </Typography>
           <IconButton size="small" onClick={(e) => setAnchor(e.currentTarget)}>

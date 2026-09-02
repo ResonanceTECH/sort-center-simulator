@@ -23,7 +23,7 @@ export function RetryAlert({ message, onRetry }: RetryAlertProps) {
       }
       sx={{
         mb: 3,
-        bgcolor: 'rgba(0, 26, 52, 0.10)',
+        bgcolor: 'rgba(9, 9, 11, 0.08)',
         color: OZON.darkSpace,
         border: `1px solid ${OZON.darkSpace}`,
         '& .MuiAlert-icon': { color: OZON.darkSpace },

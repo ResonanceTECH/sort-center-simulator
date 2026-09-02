@@ -11,7 +11,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import type { TextFieldProps } from '@mui/material/TextField';
 import type { PasswordStrength } from '@/types/auth';
 import { pillFieldSx } from '@/styles/authStyles';
-import { OZON } from '@/theme';
+import { LANDING } from '@/landing/styles/tokens';
 
 function getPasswordStrength(password: string): PasswordStrength {
   if (!password) return 'weak';
@@ -35,20 +35,20 @@ const strengthConfig: Record<
   weak: {
     label: 'Слабый',
     value: 33,
-    color: OZON.darkSpace,
-    track: 'rgba(0, 26, 52, 0.10)',
+    color: LANDING.fog,
+    track: LANDING.cloud,
   },
   medium: {
     label: 'Средний',
     value: 66,
-    color: OZON.morningBlue,
-    track: 'rgba(0, 162, 255, 0.10)',
+    color: LANDING.ember,
+    track: 'rgba(255, 90, 0, 0.12)',
   },
   strong: {
     label: 'Надёжный',
     value: 100,
-    color: OZON.blue,
-    track: 'rgba(0, 91, 255, 0.12)',
+    color: '#3f7d4e',
+    track: '#e8f2ea',
   },
 };
 
@@ -83,7 +83,7 @@ export function PasswordField({
                 onClick={() => setVisible((prev) => !prev)}
                 edge="end"
                 size="small"
-                sx={{ mr: 0.5, color: 'rgba(0, 26, 52, 0.44)' }}
+                sx={{ mr: 0.5, color: LANDING.fog }}
               >
                 {visible ? (
                   <VisibilityOff fontSize="small" />

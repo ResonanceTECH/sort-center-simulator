@@ -26,8 +26,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
 import { useUiStore } from '@/store/uiStore';
-import { OZON, SIDEBAR_WIDTH } from '@/theme';
-import { PROJECTS_PAGE } from '@/constants/projects';
+import { LANDING } from '@/landing/styles/tokens';
 import type { Notification } from '@/types/general';
 
 interface TopBarProps {
@@ -58,14 +57,12 @@ export function TopBar({ notifications }: TopBarProps) {
       position="sticky"
       elevation={0}
       sx={{
-        bgcolor: OZON.white,
-        borderBottom: `1px solid ${PROJECTS_PAGE.border}`,
-        color: OZON.darkSpace,
-        ml: { md: `${SIDEBAR_WIDTH}px` },
-        width: { md: `calc(100% - ${SIDEBAR_WIDTH}px)` },
+        bgcolor: LANDING.snow,
+        borderBottom: `1px solid ${LANDING.border}`,
+        color: LANDING.ink,
       }}
     >
-      <Toolbar sx={{ gap: 2, minHeight: '64px !important', px: { xs: 2, md: 3 } }}>
+      <Toolbar sx={{ gap: 2, minHeight: '64px !important', px: { xs: 2.5, sm: 4, md: 5 } }}>
         {isMobile && (
           <IconButton edge="start" onClick={toggleSidebar} aria-label="Меню">
             <MenuIcon />
@@ -81,15 +78,15 @@ export function TopBar({ notifications }: TopBarProps) {
             flex: 1,
             maxWidth: { md: 480 },
             '& .MuiOutlinedInput-root': {
-              borderRadius: '10px',
-              bgcolor: OZON.white,
+              borderRadius: LANDING.radiusButton,
+              bgcolor: LANDING.paper,
               fontSize: '0.875rem',
             },
           }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <Search sx={{ color: PROJECTS_PAGE.textMuted, fontSize: 20 }} />
+                <Search sx={{ color: LANDING.fog, fontSize: 20 }} />
               </InputAdornment>
             ),
           }}
@@ -98,7 +95,7 @@ export function TopBar({ notifications }: TopBarProps) {
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
           <IconButton onClick={(e) => setNotifAnchor(e.currentTarget)} aria-label="Уведомления">
-            <Badge badgeContent={unreadCount} color="primary">
+            <Badge badgeContent={unreadCount} color="secondary">
               <NotificationsOutlined />
             </Badge>
           </IconButton>
@@ -110,18 +107,18 @@ export function TopBar({ notifications }: TopBarProps) {
               alignItems: 'center',
               gap: 1,
               cursor: 'pointer',
-              borderRadius: '10px',
+              borderRadius: LANDING.radiusButton,
               px: 1,
               py: 0.5,
-              '&:hover': { bgcolor: 'rgba(0, 91, 255, 0.08)' },
+              '&:hover': { bgcolor: LANDING.paper },
             }}
           >
             <Avatar
               sx={{
                 width: 36,
                 height: 36,
-                bgcolor: OZON.blue,
-                color: OZON.white,
+                bgcolor: LANDING.obsidian,
+                color: LANDING.snow,
                 fontSize: '0.875rem',
               }}
             >
@@ -132,13 +129,13 @@ export function TopBar({ notifications }: TopBarProps) {
                 <Typography variant="body2" fontWeight={600} lineHeight={1.2}>
                   {displayName}
                 </Typography>
-                <Typography variant="caption" sx={{ color: PROJECTS_PAGE.textSecondary }}>
+                <Typography variant="caption" sx={{ color: LANDING.muted }}>
                   Руководитель проекта
                 </Typography>
               </Box>
             )}
             {!isMobile && (
-              <KeyboardArrowDown sx={{ color: PROJECTS_PAGE.textMuted, fontSize: 18 }} />
+              <KeyboardArrowDown sx={{ color: LANDING.fog, fontSize: 18 }} />
             )}
           </Box>
         </Box>
@@ -183,8 +180,8 @@ export function TopBar({ notifications }: TopBarProps) {
                   width: 24,
                   height: 24,
                   fontSize: '0.75rem',
-                  bgcolor: OZON.blue,
-                  color: OZON.white,
+                  bgcolor: LANDING.obsidian,
+                  color: LANDING.snow,
                 }}
               >
                 {displayName.charAt(0)}
@@ -204,7 +201,7 @@ export function TopBar({ notifications }: TopBarProps) {
           <MenuItem onClick={handleLogout}>
             <ListItemText
               primary="Выйти"
-              primaryTypographyProps={{ color: OZON.darkSpace, fontWeight: 600 }}
+              primaryTypographyProps={{ color: LANDING.ink, fontWeight: 600 }}
             />
           </MenuItem>
         </Menu>

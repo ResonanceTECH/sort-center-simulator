@@ -2,12 +2,13 @@ import { Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Button,
-  Container,
   Paper,
   Typography,
 } from '@mui/material';
 import { HomeOutlined, LoginOutlined, SearchOffOutlined } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
+import { LANDING, landingFont } from '@/landing/styles/tokens';
+import { PAGE_MAX_WIDTH } from '@/theme';
 
 export function NotFound() {
   const { isAuthenticated } = useAuth();
@@ -19,26 +20,29 @@ export function NotFound() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: 'background.default',
-        p: 2,
+        bgcolor: LANDING.canvas,
+        fontFamily: landingFont,
+        p: { xs: 2.5, sm: 4 },
       }}
     >
-      <Container maxWidth="sm">
+      <Box sx={{ width: '100%', maxWidth: PAGE_MAX_WIDTH, mx: 'auto', display: 'flex', justifyContent: 'center' }}>
         <Paper
           elevation={0}
           sx={{
+            width: '100%',
+            maxWidth: 480,
             p: { xs: 4, sm: 5 },
             textAlign: 'center',
-            border: '1px solid',
-            borderColor: 'divider',
+            borderRadius: LANDING.radiusCard,
+            border: `1px solid ${LANDING.border}`,
           }}
         >
           <Box
             sx={{
               width: 72,
               height: 72,
-              borderRadius: '16px',
-              bgcolor: 'primary.light',
+              borderRadius: LANDING.radiusButton,
+              bgcolor: LANDING.paper,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -46,16 +50,16 @@ export function NotFound() {
               mb: 3,
             }}
           >
-            <SearchOffOutlined sx={{ fontSize: 36, color: 'primary.main' }} />
+            <SearchOffOutlined sx={{ fontSize: 36, color: LANDING.ink }} />
           </Box>
 
           <Typography
-            variant="h4"
             component="p"
             sx={{
-              fontSize: { xs: '4rem', sm: '5rem' },
-              fontWeight: 800,
-              color: 'primary.main',
+              fontSize: { xs: '3.5rem', sm: '4.5rem' },
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
+              color: LANDING.ink,
               lineHeight: 1,
               mb: 1,
             }}
@@ -63,11 +67,28 @@ export function NotFound() {
             404
           </Typography>
 
-          <Typography variant="h5" fontWeight={700} gutterBottom>
+          <Typography
+            sx={{
+              fontSize: '1.25rem',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: LANDING.ink,
+              mb: 1,
+            }}
+          >
             Страница не найдена
           </Typography>
 
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 4, maxWidth: 360, mx: 'auto' }}>
+          <Typography
+            sx={{
+              mb: 4,
+              maxWidth: 360,
+              mx: 'auto',
+              color: LANDING.muted,
+              fontSize: '0.9375rem',
+              lineHeight: 1.5,
+            }}
+          >
             Запрашиваемая страница не существует, была перемещена или временно недоступна.
           </Typography>
 
@@ -79,7 +100,7 @@ export function NotFound() {
                 variant="contained"
                 startIcon={<HomeOutlined />}
               >
-                На главную
+                К проектам
               </Button>
             ) : (
               <Button
@@ -91,15 +112,12 @@ export function NotFound() {
                 Войти
               </Button>
             )}
-            <Button
-              variant="outlined"
-              onClick={() => window.history.back()}
-            >
+            <Button variant="outlined" onClick={() => window.history.back()}>
               Назад
             </Button>
           </Box>
         </Paper>
-      </Container>
+      </Box>
     </Box>
   );
 }

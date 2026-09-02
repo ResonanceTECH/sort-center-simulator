@@ -1,4 +1,5 @@
 import { Outlet, useParams } from 'react-router-dom';
+import { ScenarioSubNav } from '@/components/project/ScenarioSubNav';
 import {
   ResourceMissing,
   WorkspaceError,
@@ -52,6 +53,7 @@ export function ScenarioLayout() {
 
   return (
     <ScenarioContext.Provider value={{ scenario }}>
+      <ScenarioSubNav />
       <Outlet />
     </ScenarioContext.Provider>
   );

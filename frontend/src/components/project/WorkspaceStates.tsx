@@ -5,7 +5,7 @@ import { ArrowBack, SearchOffOutlined } from '@mui/icons-material';
 import { AppLayout } from '@/layouts/AppLayout';
 import { TopBar } from '@/components/general/TopBar';
 import { RetryAlert } from '@/components/shared/RetryAlert';
-import { OZON } from '@/theme';
+import { LANDING } from '@/landing/styles/tokens';
 import { PROJECTS_PAGE } from '@/constants/projects';
 import type { Notification } from '@/types/general';
 
@@ -60,12 +60,20 @@ export function ResourceMissingContent({
           mb: 2.5,
         }}
       >
-        <SearchOffOutlined sx={{ fontSize: 32, color: OZON.blue }} />
+        <SearchOffOutlined sx={{ fontSize: 32, color: LANDING.ink }} />
       </Box>
-      <Typography variant="h5" fontWeight={700} gutterBottom>
+      <Typography
+        sx={{
+          fontSize: '1.25rem',
+          fontWeight: 600,
+          letterSpacing: '-0.02em',
+          color: LANDING.ink,
+          mb: 1,
+        }}
+      >
         {title}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+      <Typography sx={{ fontSize: '0.9375rem', color: LANDING.muted, mb: 3, lineHeight: 1.5 }}>
         {description}
       </Typography>
       <Button

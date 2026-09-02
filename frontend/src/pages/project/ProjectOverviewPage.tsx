@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Button,
+  Chip,
   CircularProgress,
   Paper,
   Stack,
@@ -18,6 +19,7 @@ import {
   SettingsOutlined,
   TimelineOutlined,
 } from '@mui/icons-material';
+import { PermissionGate } from '@/components/project/PermissionGate';
 import { ProjectStatusBadge } from '@/components/projects/ProjectStatusBadge';
 import { PROJECTS_PAGE, RUN_STATUS_CONFIG } from '@/constants/projects';
 import { useProjectContext } from '@/context/projectContext';
@@ -38,7 +40,7 @@ function RunStatusChip({ status }: { status: RunSummary['status'] }) {
         alignItems: 'center',
         px: 1,
         py: 0.25,
-        borderRadius: '999px',
+        borderRadius: '12px',
         bgcolor: config.bg,
         border: `1px solid ${config.border}`,
         color: config.color,
@@ -98,7 +100,7 @@ function SectionCard({
           mb: 2,
         }}
       >
-        <Typography sx={{ fontSize: '0.9375rem', fontWeight: 700, color: OZON.darkSpace }}>
+        <Typography sx={{ fontSize: '0.9375rem', fontWeight: 600, color: OZON.darkSpace }}>
           {title}
         </Typography>
         {action}
@@ -126,14 +128,14 @@ function ScenarioRow({
         gap: 2,
         px: 1.5,
         py: 1.25,
-        borderRadius: '10px',
+        borderRadius: '14px',
         textDecoration: 'none',
         color: 'inherit',
         border: `1px solid transparent`,
         transition: 'background-color 0.15s, border-color 0.15s',
         '&:hover': {
-          bgcolor: 'rgba(0, 91, 255, 0.04)',
-          borderColor: 'rgba(0, 91, 255, 0.2)',
+          bgcolor: 'rgba(9, 9, 11, 0.03)',
+          borderColor: 'rgba(9, 9, 11, 0.16)',
         },
       }}
     >
@@ -158,10 +160,10 @@ function ScenarioRow({
                 fontSize: '0.6875rem',
                 fontWeight: 600,
                 color: OZON.blue,
-                bgcolor: 'rgba(0, 91, 255, 0.08)',
+                bgcolor: 'rgba(9, 9, 11, 0.06)',
                 px: 0.75,
                 py: 0.15,
-                borderRadius: '6px',
+                borderRadius: '12px',
                 flexShrink: 0,
               }}
             >
@@ -179,7 +181,7 @@ function ScenarioRow({
 }
 
 export function ProjectOverviewPage() {
-  const { project, refresh } = useProjectContext();
+  const { project, access, refresh } = useProjectContext();
   const showSnackbar = useUiStore((s) => s.showSnackbar);
   const [starting, setStarting] = useState(false);
 
@@ -218,19 +220,22 @@ export function ProjectOverviewPage() {
       >
         <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography
-            variant="h4"
             sx={{
-              fontSize: { xs: '1.375rem', sm: '1.5rem' },
-              fontWeight: 700,
-              color: OZON.darkSpace,
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              color: PROJECTS_PAGE.textMuted,
               mb: 1,
-              wordBreak: 'break-word',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
             }}
           >
-            {project.name}
+            Обзор
           </Typography>
           <Stack direction="row" flexWrap="wrap" gap={2} alignItems="center">
             <ProjectStatusBadge status={project.status} />
+            {access && (
+              <Chip size="small" label={access.roleLabel} variant="outlined" />
+            )}
             <MetaRow icon={<AccessTime sx={{ fontSize: 16 }} />}>
               Изменён {formatProjectDate(project.updatedAt)}
             </MetaRow>
@@ -254,36 +259,42 @@ export function ProjectOverviewPage() {
       <Stack direction="row" flexWrap="wrap" gap={1.25} sx={{ mb: 3.5 }}>
         {scenarioId && (
           <>
-            <Button
-              component={RouterLink}
-              to={`/projects/${project.id}/scenarios/${scenarioId}/editor`}
-              variant="contained"
-              startIcon={<OpenInNew />}
-            >
-              Открыть редактор
-            </Button>
-            <Button
-              component={RouterLink}
-              to={`/projects/${project.id}/scenarios/${scenarioId}/parameters`}
-              variant="outlined"
-              startIcon={<SettingsOutlined />}
-            >
-              Параметры
-            </Button>
+            <PermissionGate resource="model" action="read">
+              <Button
+                component={RouterLink}
+                to={`/projects/${project.id}/scenarios/${scenarioId}/editor`}
+                variant="contained"
+                startIcon={<OpenInNew />}
+              >
+                Открыть редактор
+              </Button>
+            </PermissionGate>
+            <PermissionGate resource="equipment_params" action="update">
+              <Button
+                component={RouterLink}
+                to={`/projects/${project.id}/scenarios/${scenarioId}/parameters`}
+                variant="outlined"
+                startIcon={<SettingsOutlined />}
+              >
+                Параметры
+              </Button>
+            </PermissionGate>
           </>
         )}
-        <Button
-          variant="outlined"
-          startIcon={
-            starting ? <CircularProgress size={16} color="inherit" /> : <PlayArrowOutlined />
-          }
-          disabled={starting || !scenarioId || project.status === 'archived'}
-          onClick={() => {
-            void handleStartCalculation();
-          }}
-        >
-          Запустить расчёт
-        </Button>
+        <PermissionGate resource="simulation_run" action="create">
+          <Button
+            variant="outlined"
+            startIcon={
+              starting ? <CircularProgress size={16} color="inherit" /> : <PlayArrowOutlined />
+            }
+            disabled={starting || !scenarioId || project.status === 'archived'}
+            onClick={() => {
+              void handleStartCalculation();
+            }}
+          >
+            Запустить расчёт
+          </Button>
+        </PermissionGate>
         <Button
           component={RouterLink}
           to={`/projects/${project.id}/runs`}
@@ -300,6 +311,15 @@ export function ProjectOverviewPage() {
         >
           Сравнить сценарии
         </Button>
+        <PermissionGate capability="manageMembers">
+          <Button
+            component={RouterLink}
+            to={`/projects/${project.id}/members`}
+            variant="outlined"
+          >
+            Участники
+          </Button>
+        </PermissionGate>
       </Stack>
 
       <Box

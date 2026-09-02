@@ -47,7 +47,7 @@ export function ReportsToolbar({
         <Select
           value={type}
           onChange={(e) => onTypeChange(e.target.value as ReportType | 'all')}
-          sx={{ bgcolor: OZON.white, borderRadius: '10px' }}
+          sx={{ bgcolor: OZON.white, borderRadius: '14px' }}
           inputProps={{ 'aria-label': 'Фильтр по типу' }}
         >
           {REPORT_TYPE_OPTIONS.map((opt) => (
@@ -62,7 +62,7 @@ export function ReportsToolbar({
         <Select
           value={status}
           onChange={(e) => onStatusChange(e.target.value as ReportStatus | 'all')}
-          sx={{ bgcolor: OZON.white, borderRadius: '10px' }}
+          sx={{ bgcolor: OZON.white, borderRadius: '14px' }}
           inputProps={{ 'aria-label': 'Фильтр по статусу' }}
         >
           {REPORT_STATUS_OPTIONS.map((opt) => (
@@ -77,7 +77,7 @@ export function ReportsToolbar({
         <Select
           value={format}
           onChange={(e) => onFormatChange(e.target.value as ReportFormat | 'all')}
-          sx={{ bgcolor: OZON.white, borderRadius: '10px' }}
+          sx={{ bgcolor: OZON.white, borderRadius: '14px' }}
           inputProps={{ 'aria-label': 'Фильтр по формату' }}
         >
           {REPORT_FORMAT_OPTIONS.map((opt) => (

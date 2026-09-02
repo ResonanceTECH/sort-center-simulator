@@ -5,12 +5,13 @@ import {
   WorkspaceLoading,
   WorkspaceShell,
 } from '@/components/project/WorkspaceStates';
+import { ProjectNav } from '@/components/project/ProjectNav';
 import { ProjectContext } from '@/context/projectContext';
 import { useProjectData } from '@/hooks/useProjectWorkspace';
 
 export function ProjectLayout() {
   const { projectId } = useParams<{ projectId: string }>();
-  const { data: project, error, loading, retry } = useProjectData(projectId);
+  const { data: project, access, error, loading, retry } = useProjectData(projectId);
 
   if (!projectId?.trim()) {
     return (
@@ -39,8 +40,9 @@ export function ProjectLayout() {
   }
 
   return (
-    <ProjectContext.Provider value={{ project, refresh: retry }}>
+    <ProjectContext.Provider value={{ project, access, refresh: retry }}>
       <WorkspaceShell notifications={project.notifications}>
+        <ProjectNav />
         <Outlet />
       </WorkspaceShell>
     </ProjectContext.Provider>

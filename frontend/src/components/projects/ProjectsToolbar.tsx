@@ -49,7 +49,7 @@ export function ProjectsToolbar({
           value={status}
           onChange={(e) => onStatusChange(e.target.value as ProjectListStatus | 'all')}
           displayEmpty
-          sx={{ bgcolor: OZON.white, borderRadius: '10px' }}
+          sx={{ bgcolor: OZON.white, borderRadius: '14px' }}
           inputProps={{ 'aria-label': 'Фильтр по статусу' }}
         >
           {STATUS_FILTER_OPTIONS.map((opt) => (
@@ -64,7 +64,7 @@ export function ProjectsToolbar({
         <Select
           value={sort}
           onChange={(e) => onSortChange(e.target.value as ProjectSortOption)}
-          sx={{ bgcolor: OZON.white, borderRadius: '10px' }}
+          sx={{ bgcolor: OZON.white, borderRadius: '14px' }}
           inputProps={{ 'aria-label': 'Сортировка проектов' }}
         >
           {SORT_OPTIONS.map((opt) => (
@@ -90,9 +90,9 @@ export function ProjectsToolbar({
             color: PROJECTS_PAGE.textSecondary,
             px: 1.25,
             '&.Mui-selected': {
-              bgcolor: 'rgba(0, 91, 255, 0.10)',
+              bgcolor: 'rgba(9, 9, 11, 0.08)',
               color: OZON.blue,
-              borderColor: 'rgba(0, 91, 255, 0.32)',
+              borderColor: 'rgba(9, 9, 11, 0.20)',
             },
           },
         }}

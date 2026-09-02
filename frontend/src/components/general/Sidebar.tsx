@@ -13,8 +13,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { NAV_BOTTOM_ITEMS, NAV_ITEMS } from '@/constants/navigation';
 import { NavIcon } from '@/components/general/NavIcon';
 import { useUiStore } from '@/store/uiStore';
-import { OZON, SIDEBAR_WIDTH } from '@/theme';
-import { PROJECTS_PAGE } from '@/constants/projects';
+import { LANDING, landingFont } from '@/landing/styles/tokens';
+import { SIDEBAR_WIDTH } from '@/theme';
 
 function LogoMark() {
   return (
@@ -22,8 +22,10 @@ function LogoMark() {
       sx={{
         width: 32,
         height: 32,
-        borderRadius: '8px',
-        background: `linear-gradient(135deg, ${OZON.blue} 0%, ${OZON.morningBlue} 100%)`,
+        borderRadius: LANDING.radiusBadge,
+        bgcolor: LANDING.obsidian,
+        border: '1.5px solid #2c2e34',
+        boxShadow: LANDING.shadowPrimary,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -32,11 +34,10 @@ function LogoMark() {
     >
       <Box
         sx={{
-          width: 14,
-          height: 14,
-          borderLeft: `3px solid ${OZON.white}`,
-          borderBottom: `3px solid ${OZON.white}`,
-          transform: 'rotate(-45deg) translate(1px, -1px)',
+          width: 10,
+          height: 10,
+          borderRadius: '2px',
+          bgcolor: LANDING.ember,
         }}
       />
     </Box>
@@ -54,25 +55,26 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   const renderItems = (items: typeof NAV_ITEMS) =>
     items.map((item) => {
-      const active = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+      const active =
+        location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
       return (
         <ListItemButton
           key={item.id}
           onClick={() => handleNav(item.path)}
           sx={{
-            borderRadius: '10px',
+            borderRadius: LANDING.radiusButton,
             mb: 0.25,
             py: 1,
             px: 1.5,
             transition: 'background-color 0.18s ease',
-            bgcolor: active ? 'rgba(0, 91, 255, 0.10)' : 'transparent',
-            borderLeft: active ? `3px solid ${OZON.blue}` : '3px solid transparent',
+            bgcolor: active ? LANDING.paper : 'transparent',
+            borderLeft: active ? `3px solid ${LANDING.ember}` : '3px solid transparent',
             '&:hover': {
-              bgcolor: active ? 'rgba(0, 91, 255, 0.10)' : 'rgba(0, 162, 255, 0.08)',
+              bgcolor: active ? LANDING.paper : LANDING.subtle,
             },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 36, color: active ? OZON.blue : OZON.darkSpace }}>
+          <ListItemIcon sx={{ minWidth: 36, color: active ? LANDING.ink : LANDING.steel }}>
             <NavIcon name={item.icon} />
           </ListItemIcon>
           <ListItemText
@@ -80,7 +82,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             primaryTypographyProps={{
               fontSize: '0.8125rem',
               fontWeight: active ? 600 : 400,
-              color: active ? OZON.blue : OZON.darkSpace,
+              color: active ? LANDING.ink : LANDING.body,
             }}
           />
         </ListItemButton>
@@ -93,15 +95,22 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        bgcolor: OZON.white,
-        borderRight: `1px solid ${PROJECTS_PAGE.border}`,
+        bgcolor: LANDING.snow,
+        borderRight: `1px solid ${LANDING.border}`,
+        fontFamily: landingFont,
       }}
     >
       <Box sx={{ px: 2, py: 2.5, display: 'flex', alignItems: 'center', gap: 1.5 }}>
         <LogoMark />
         <Typography
           variant="body2"
-          sx={{ fontWeight: 700, lineHeight: 1.3, fontSize: '0.875rem', color: OZON.darkSpace }}
+          sx={{
+            fontWeight: 600,
+            lineHeight: 1.3,
+            fontSize: '0.875rem',
+            color: LANDING.ink,
+            letterSpacing: '-0.02em',
+          }}
         >
           Конструктор СЦ
         </Typography>
@@ -129,7 +138,7 @@ export function Sidebar() {
           '& .MuiDrawer-paper': {
             width: SIDEBAR_WIDTH,
             border: 'none',
-            boxShadow: '0 8px 24px rgba(0, 26, 52, 0.12)',
+            boxShadow: '0 12px 32px rgba(9, 9, 11, 0.12)',
           },
         }}
       >

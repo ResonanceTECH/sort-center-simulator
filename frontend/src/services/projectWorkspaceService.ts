@@ -1,138 +1,105 @@
-import axios from 'axios';
-import { apiClient } from '@/api/client';
-import { mapProjectStatus, mapScenarioSummary } from '@/api/mappers';
-import {
-  cacheProjectDetail,
-  getRunDetail,
-  getScenarioDetail,
-} from '@/mocks/projectWorkspaceData';
-import { getProjectsNotifications } from '@/mocks/projectsData';
-import { delay, getErrorMessage } from '@/utils/error';
+import { useApiMocks } from '@/config/env';
+import * as projectWorkspaceApi from '@/services/projectWorkspace/projectWorkspaceApi';
+import * as projectWorkspaceMock from '@/services/projectWorkspace/projectWorkspaceMock';
 import type {
   ProjectDetail,
-  ProjectDetailApiResponse,
-  ProjectScenariosApiResponse,
   RunDetail,
   RunSummary,
-  RunSummaryApi,
   ScenarioDetail,
-  ScenarioSummary,
-  ScenarioSummaryApi,
 } from '@/types/projectWorkspace';
+import type { RunComparisonItem, RunMetrics, SimEvent, TraceData } from '@/types/simulation';
 
-const BASE_DELAY_MS = 450;
-const ERROR_CHANCE = 0.01;
+const impl = () => (useApiMocks() ? projectWorkspaceMock : projectWorkspaceApi);
 
-function maybeThrowRandomError(message: string): void {
-  if (Math.random() < ERROR_CHANCE) {
-    throw new Error(message);
-  }
-}
-
-function mapRunStatus(value: unknown): RunSummary['status'] {
-  if (value === 'queued' || value === 'running' || value === 'completed' || value === 'failed') {
-    return value;
-  }
-  return 'queued';
-}
-
-function mapScenario(api: ScenarioSummaryApi): ScenarioSummary {
-  return mapScenarioSummary(api);
-}
-
-function mapRun(api: RunSummaryApi): RunSummary {
-  return {
-    id: api.id,
-    name: api.name,
-    status: mapRunStatus(api.status),
-    createdAt: api.created_at ?? api.createdAt ?? new Date().toISOString(),
-    scenarioId: api.scenario_id ?? api.scenarioId ?? '',
-  };
-}
-
-function mapProjectDetail(
-  project: ProjectDetailApiResponse,
-  scenariosPayload: ProjectScenariosApiResponse,
-): ProjectDetail {
-  const scenarios = (scenariosPayload.scenarios ?? scenariosPayload.items ?? []).map(mapScenario);
-  const defaultScenarioId =
-    project.default_scenario_id ??
-    project.defaultScenarioId ??
-    scenarios.find((item) => item.isDefault)?.id ??
-    scenarios[0]?.id ??
-    null;
-
-  const lastRunApi = project.last_run ?? project.lastRun ?? null;
-  const lastRun = lastRunApi ? mapRun(lastRunApi) : null;
-
-  return {
-    id: project.id,
-    name: project.name,
-    status: mapProjectStatus(project.status),
-    updatedAt: project.updated_at ?? project.updatedAt ?? new Date().toISOString(),
-    description: project.description ?? undefined,
-    scenarios: scenarios.map((scenario) => ({
-      ...scenario,
-      isDefault: scenario.id === defaultScenarioId,
-    })),
-    runs: lastRun ? [lastRun] : [],
-    defaultScenarioId,
-    lastRun,
-    notifications: getProjectsNotifications(),
-  };
-}
-
-/** GET /api/v1/projects/{projectId} + GET /api/v1/projects/{projectId}/scenarios */
+/** GET project + scenarios (+ runs in API mode) */
 export async function fetchProjectById(projectId: string): Promise<ProjectDetail | null> {
-  const normalized = projectId.trim();
-  if (!normalized) return null;
-
-  try {
-    const [projectRes, scenariosRes] = await Promise.all([
-      apiClient.get<ProjectDetailApiResponse>(`/projects/${normalized}`),
-      apiClient.get<ProjectScenariosApiResponse>(`/projects/${normalized}/scenarios`),
-    ]);
-
-    const detail = mapProjectDetail(projectRes.data, scenariosRes.data);
-    return cacheProjectDetail(detail);
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return null;
-    }
-    throw new Error(getErrorMessage(error, 'Не удалось загрузить проект. Попробуйте ещё раз.'));
-  }
+  return impl().fetchProjectById(projectId);
 }
 
-/** POST /api/v1/projects/{projectId}/runs */
+/** POST /projects/{projectId}/runs */
 export async function startProjectCalculation(projectId: string): Promise<RunSummary> {
-  const { data } = await apiClient.post<RunSummaryApi>(`/projects/${projectId}/runs`);
-  return mapRun(data);
+  return impl().startProjectCalculation(projectId);
 }
 
+export async function startProjectRun(
+  projectId: string,
+  options?: {
+    scenarioId?: string;
+    type?: 'analytical' | 'simulation';
+    seed?: number;
+  },
+): Promise<RunSummary> {
+  return impl().startProjectRun(projectId, options ?? {});
+}
+
+export async function createScenario(
+  projectId: string,
+  payload: { name: string; copyFromId?: string },
+): Promise<import('@/types/projectWorkspace').ScenarioSummary> {
+  return impl().createScenario(projectId, payload);
+}
+
+export async function setDefaultScenario(projectId: string, scenarioId: string): Promise<void> {
+  return impl().setDefaultScenario(projectId, scenarioId);
+}
+
+/** GET /projects/{projectId}/scenarios/{scenarioId} */
 export async function fetchScenarioById(
   projectId: string,
   scenarioId: string,
 ): Promise<ScenarioDetail | null> {
-  await delay(BASE_DELAY_MS);
-  maybeThrowRandomError('Не удалось загрузить сценарий. Попробуйте ещё раз.');
-
-  const normalizedProjectId = projectId.trim();
-  const normalizedScenarioId = scenarioId.trim();
-  if (!normalizedProjectId || !normalizedScenarioId) return null;
-
-  return getScenarioDetail(normalizedProjectId, normalizedScenarioId);
+  return impl().fetchScenarioById(projectId, scenarioId);
 }
 
-export async function fetchRunById(
+/** GET /projects/{projectId}/runs */
+export async function fetchRuns(projectId: string): Promise<RunSummary[]> {
+  return impl().fetchRuns(projectId);
+}
+
+/** GET /projects/{projectId}/runs/{runId} */
+export async function fetchRunById(projectId: string, runId: string): Promise<RunDetail | null> {
+  return impl().fetchRunById(projectId, runId);
+}
+
+/** GET /projects/{projectId}/runs/{runId}/events */
+export async function fetchRunEvents(projectId: string, runId: string): Promise<SimEvent[]> {
+  return impl().fetchRunEvents(projectId, runId);
+}
+
+/** GET /projects/{projectId}/runs/{runId}/trace */
+export async function fetchRunTrace(projectId: string, runId: string): Promise<TraceData> {
+  return impl().fetchRunTrace(projectId, runId);
+}
+
+/** GET /projects/{projectId}/runs/{runId}/metrics */
+export async function fetchRunMetrics(
   projectId: string,
   runId: string,
-): Promise<RunDetail | null> {
-  await delay(BASE_DELAY_MS);
-  maybeThrowRandomError('Не удалось загрузить прогон. Попробуйте ещё раз.');
+): Promise<{ metrics: RunMetrics; expectPassed?: boolean; expectFailures?: string[] }> {
+  return impl().fetchRunMetrics(projectId, runId);
+}
 
-  const normalizedProjectId = projectId.trim();
-  const normalizedRunId = runId.trim();
-  if (!normalizedProjectId || !normalizedRunId) return null;
+/** GET /projects/{projectId}/comparison */
+export async function fetchRunComparison(
+  projectId: string,
+  runIds: string[],
+): Promise<RunComparisonItem[]> {
+  return impl().fetchRunComparison(projectId, runIds);
+}
 
-  return getRunDetail(normalizedProjectId, normalizedRunId);
+/** GET /projects/{projectId}/scenarios/{scenarioId}/config */
+export async function fetchScenarioConfig(
+  projectId: string,
+  scenarioId: string,
+): Promise<Record<string, unknown>> {
+  return impl().fetchScenarioConfig(projectId, scenarioId);
+}
+
+/** PUT /projects/{projectId}/scenarios/{scenarioId}/config */
+export async function updateScenarioConfig(
+  projectId: string,
+  scenarioId: string,
+  config: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  return impl().updateScenarioConfig(projectId, scenarioId, config);
 }

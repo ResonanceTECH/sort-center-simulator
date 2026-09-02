@@ -164,14 +164,14 @@ export function ProjectListCard({
         outline: 'none',
         transition: 'border-color 0.15s, box-shadow 0.15s',
         '&:hover': {
-          borderColor: 'rgba(0, 91, 255, 0.45)',
+          borderColor: 'rgba(9, 9, 11, 0.35)',
           boxShadow: 'none',
           '& .project-thumb': { filter: 'none', opacity: 1 },
           '& .card-open-hint': { opacity: isRenaming ? 0 : 1 },
         },
         '&:focus-visible': {
           borderColor: OZON.blue,
-          boxShadow: '0 0 0 3px rgba(0, 91, 255, 0.28)',
+          boxShadow: '0 0 0 3px rgba(9, 9, 11, 0.16)',
         },
       }}
     >
@@ -216,8 +216,8 @@ export function ProjectListCard({
             bottom: 10,
             px: 1,
             py: 0.25,
-            borderRadius: '6px',
-            bgcolor: 'rgba(0, 26, 52, 0.72)',
+            borderRadius: '12px',
+            bgcolor: 'rgba(9, 9, 11, 0.72)',
             color: OZON.white,
             fontSize: '0.6875rem',
             fontWeight: 600,
@@ -281,7 +281,7 @@ export function ProjectListCard({
               overflow: 'hidden',
               cursor: 'text',
               borderRadius: '4px',
-              '&:hover': { bgcolor: 'rgba(0, 91, 255, 0.04)' },
+              '&:hover': { bgcolor: 'rgba(9, 9, 11, 0.03)' },
             }}
           >
             {project.name}

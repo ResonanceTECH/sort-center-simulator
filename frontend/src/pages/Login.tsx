@@ -19,6 +19,7 @@ import { AuthTextField } from '@/components/AuthTextField';
 import { PasswordField } from '@/components/PasswordField';
 import { useAuth } from '@/hooks/useAuth';
 import { AUTH_COLORS, pillButtonSx } from '@/styles/authStyles';
+import { LANDING } from '@/landing/styles/tokens';
 
 const schema = yup.object({
   email: yup
@@ -73,7 +74,7 @@ export function Login() {
       subtitle="Войдите, чтобы продолжить работу с проектами и сценариями"
     >
       {error && (
-        <Alert severity="error" sx={{ mb: 2, borderRadius: '16px', width: '100%' }}>
+        <Alert severity="error" sx={{ mb: 2, borderRadius: LANDING.radiusButton, width: '100%' }}>
           {error}
         </Alert>
       )}
