@@ -28,6 +28,7 @@ import {
   formatFileSize,
 } from '@/constants/reports';
 import { PROJECTS_PAGE } from '@/constants/projects';
+import { LANDING } from '@/landing/styles/tokens';
 import { OZON } from '@/theme';
 import type { ReportListItem } from '@/types/reports';
 
@@ -46,7 +47,7 @@ function StatusBadge({ status }: { status: ReportListItem['status'] }) {
         display: 'inline-flex',
         px: 1.25,
         py: 0.35,
-        borderRadius: '999px',
+        borderRadius: LANDING.radiusBadge,
         bgcolor: config.bg,
         border: `1px solid ${config.border}`,
         color: config.color,

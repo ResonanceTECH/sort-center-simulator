@@ -1,27 +1,27 @@
 import { Box, Typography } from '@mui/material';
-import { OZON } from '@/theme';
-import { PROJECTS_PAGE } from '@/constants/projects';
+import { LANDING } from '@/landing/styles/tokens';
 
 export function ReportsHeader() {
   return (
-    <Box sx={{ mb: 3, maxWidth: 720 }}>
+    <Box sx={{ mb: 3, maxWidth: 560 }}>
       <Typography
         component="h1"
         sx={{
-          fontSize: { xs: '1.5rem', md: '1.75rem' },
-          fontWeight: 700,
-          color: OZON.darkSpace,
+          fontSize: { xs: '1.75rem', md: '2rem' },
+          fontWeight: 600,
+          color: LANDING.ink,
           letterSpacing: '-0.02em',
-          mb: 0.75,
+          lineHeight: 1.2,
+          mb: 1,
         }}
       >
-        Отчеты
+        Отчёты
       </Typography>
       <Typography
         sx={{
           fontSize: '0.9375rem',
-          color: PROJECTS_PAGE.textSecondary,
-          lineHeight: 1.55,
+          color: LANDING.muted,
+          lineHeight: 1.5,
         }}
       >
         Скачивайте результаты симуляций, статистику и сравнения сценариев

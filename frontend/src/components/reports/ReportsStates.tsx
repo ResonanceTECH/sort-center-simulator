@@ -12,7 +12,7 @@ export function ReportsSkeleton() {
         overflow: 'hidden',
       }}
     >
-      <Box sx={{ px: 2, py: 1.5, bgcolor: 'rgba(0, 91, 255, 0.06)' }}>
+      <Box sx={{ px: 2, py: 1.5, bgcolor: 'rgba(9, 9, 11, 0.04)' }}>
         <Skeleton variant="text" width="40%" height={24} />
       </Box>
       {Array.from({ length: 6 }).map((_, i) => (
@@ -54,7 +54,7 @@ export function ReportsEmpty({ filtered = false }: ReportsEmptyProps) {
       <Typography
         sx={{
           fontSize: { xs: '1.25rem', md: '1.5rem' },
-          fontWeight: 700,
+          fontWeight: 600,
           color: OZON.darkSpace,
           mb: 1.25,
         }}
@@ -93,7 +93,7 @@ export function ReportsError({ onRetry }: ReportsErrorProps) {
       }}
       role="alert"
     >
-      <Typography sx={{ fontSize: '1.0625rem', fontWeight: 700, color: OZON.darkSpace, mb: 0.75 }}>
+      <Typography sx={{ fontSize: '1.0625rem', fontWeight: 600, color: OZON.darkSpace, mb: 0.75 }}>
         Не удалось загрузить отчёты
       </Typography>
       <Typography sx={{ fontSize: '0.875rem', color: PROJECTS_PAGE.textSecondary, mb: 2.5 }}>
