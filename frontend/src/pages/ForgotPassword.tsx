@@ -15,6 +15,7 @@ import { AuthForm } from '@/components/AuthForm';
 import { AuthTextField } from '@/components/AuthTextField';
 import { forgotPassword } from '@/services/authService';
 import { AUTH_COLORS, pillButtonSx } from '@/styles/authStyles';
+import { LANDING } from '@/landing/styles/tokens';
 
 interface ForgotPasswordForm {
   email: string;
@@ -59,13 +60,13 @@ export function ForgotPassword() {
       footer={null}
     >
       {error && (
-        <Alert severity="error" sx={{ mb: 2, borderRadius: '16px', width: '100%' }}>
+        <Alert severity="error" sx={{ mb: 2, borderRadius: LANDING.radiusButton, width: '100%' }}>
           {error}
         </Alert>
       )}
 
       {success ? (
-        <Alert severity="success" sx={{ mb: 2, borderRadius: '16px', width: '100%' }}>
+        <Alert severity="success" sx={{ mb: 2, borderRadius: LANDING.radiusButton, width: '100%' }}>
           Ссылка для восстановления пароля отправлена на указанный email.
           Проверьте почту.
         </Alert>

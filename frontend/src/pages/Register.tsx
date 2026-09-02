@@ -19,6 +19,7 @@ import { AuthTextField } from '@/components/AuthTextField';
 import { PasswordField } from '@/components/PasswordField';
 import { useAuth } from '@/hooks/useAuth';
 import { AUTH_COLORS, pillButtonSx, registerFieldsGridSx } from '@/styles/authStyles';
+import { LANDING } from '@/landing/styles/tokens';
 
 const schema = yup.object({
   name: yup
@@ -95,7 +96,7 @@ export function Register() {
       subtitle="Зарегистрируйтесь, чтобы создавать модели и сравнивать сценарии"
     >
       {error && (
-        <Alert severity="error" sx={{ mb: 2, borderRadius: '16px', width: '100%' }}>
+        <Alert severity="error" sx={{ mb: 2, borderRadius: LANDING.radiusButton, width: '100%' }}>
           {error}
         </Alert>
       )}
@@ -211,7 +212,7 @@ export function Register() {
           )}
         />
         {errors.agreeToTerms && (
-          <Alert severity="error" sx={{ py: 0, borderRadius: '16px', width: '100%' }}>
+          <Alert severity="error" sx={{ py: 0, borderRadius: LANDING.radiusButton, width: '100%' }}>
             {errors.agreeToTerms.message}
           </Alert>
         )}
