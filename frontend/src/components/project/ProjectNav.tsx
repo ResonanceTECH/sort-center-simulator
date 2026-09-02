@@ -1,83 +1,115 @@
-import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
-import { Box, Tab, Tabs } from '@mui/material';
-import { useProjectContext } from '@/context/projectContext';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Box, Chip, Tab, Tabs, Tooltip, Typography } from '@mui/material';
+import { ArrowBack } from '@mui/icons-material';
+import { ProjectStatusBadge } from '@/components/projects/ProjectStatusBadge';
+import {
+  buildProjectNavContext,
+  filterProjectNavTabs,
+  resolveActiveProjectTab,
+} from '@/constants/projectNav';
 import { PROJECTS_PAGE } from '@/constants/projects';
-
-interface NavTab {
-  label: string;
-  path: string;
-  match: (pathname: string) => boolean;
-}
+import { useProjectContext } from '@/context/projectContext';
+import { OZON } from '@/theme';
 
 export function ProjectNav() {
-  const { project } = useProjectContext();
-  const { projectId, scenarioId } = useParams<{ projectId: string; scenarioId?: string }>();
+  const { project, access } = useProjectContext();
   const location = useLocation();
-  const base = `/projects/${projectId}`;
-  const defaultScenarioId = project.defaultScenarioId ?? project.scenarios[0]?.id;
-  const editorBase = defaultScenarioId
-    ? `${base}/scenarios/${defaultScenarioId}`
-    : `${base}/scenarios`;
 
-  const tabs: NavTab[] = [
-    { label: 'Обзор', path: base, match: (p) => p === base },
-    {
-      label: 'Модель',
-      path: `${editorBase}/editor`,
-      match: (p) => p.includes('/scenarios/') && p.includes('/editor'),
-    },
-    {
-      label: 'Параметры',
-      path: `${editorBase}/parameters`,
-      match: (p) => p.includes('/parameters'),
-    },
-    { label: 'Сценарии', path: `${base}/scenarios`, match: (p) => p === `${base}/scenarios` },
-    { label: 'Расчёт', path: `${base}/simulation`, match: (p) => p.includes('/simulation') },
-    { label: 'Прогоны', path: `${base}/runs`, match: (p) => p.includes('/runs') },
-    {
-      label: 'Визуализация',
-      path: `${base}/visualization`,
-      match: (p) => p.includes('/visualization'),
-    },
-    { label: 'Статистика', path: `${base}/statistics`, match: (p) => p.includes('/statistics') },
-    { label: 'Сравнение', path: `${base}/comparison`, match: (p) => p.includes('/comparison') },
-  ];
-
-  const activeIndex = Math.max(
-    0,
-    tabs.findIndex((tab) => tab.match(location.pathname)),
+  const navContext = buildProjectNavContext(
+    project.id,
+    project.defaultScenarioId,
+    project.scenarios.map((scenario) => scenario.id),
   );
+  const tabs = filterProjectNavTabs(access);
+  const activeTab = resolveActiveProjectTab(location.pathname, project.id, tabs);
+  const activeIndex = activeTab ? tabs.findIndex((tab) => tab.id === activeTab.id) : false;
 
   return (
-    <Box
-      sx={{
-        mb: 3,
-        borderBottom: `1px solid ${PROJECTS_PAGE.border}`,
-        overflowX: 'auto',
-      }}
-    >
-      <Tabs
-        value={activeIndex}
-        variant="scrollable"
-        scrollButtons="auto"
-        sx={{ minHeight: 44 }}
+    <Box sx={{ mb: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 2,
+          mb: 2,
+        }}
       >
-        {tabs.map((tab, index) => (
-          <Tab
-            key={tab.path}
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
             component={RouterLink}
-            to={tab.path}
-            label={tab.label}
-            value={index}
-            sx={{ minHeight: 44, textTransform: 'none', fontWeight: 600 }}
-          />
-        ))}
-      </Tabs>
-      {scenarioId && location.pathname.includes('/scenarios/') && (
-        <Box sx={{ py: 1, fontSize: '0.8125rem', color: 'text.secondary' }}>
-          Сценарий: {project.scenarios.find((s) => s.id === scenarioId)?.name ?? scenarioId}
+            to="/projects"
+            variant="body2"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              mb: 1,
+              color: 'text.secondary',
+              textDecoration: 'none',
+              '&:hover': { color: OZON.blue },
+            }}
+          >
+            <ArrowBack sx={{ fontSize: 16 }} />
+            К проектам
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5 }}>
+            <Typography variant="h4" fontWeight={700} sx={{ lineHeight: 1.2 }}>
+              {project.name}
+            </Typography>
+            <ProjectStatusBadge status={project.status} />
+            {access && (
+              <Chip
+                label={access.roleLabel}
+                size="small"
+                variant="outlined"
+                sx={{ fontWeight: 600 }}
+              />
+            )}
+          </Box>
         </Box>
-      )}
+      </Box>
+
+      <Box
+        sx={{
+          borderBottom: `1px solid ${PROJECTS_PAGE.border}`,
+          overflowX: 'auto',
+        }}
+      >
+        <Tabs
+          value={activeIndex}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          sx={{ minHeight: 44 }}
+        >
+          {tabs.map((tab) => {
+            const path = tab.getPath(navContext);
+            const disabled = Boolean(tab.requiresScenario && !navContext.defaultScenarioId);
+            const tabNode = (
+              <Tab
+                key={tab.id}
+                component={disabled ? 'div' : RouterLink}
+                to={disabled ? undefined : path}
+                label={tab.label}
+                value={tabs.findIndex((item) => item.id === tab.id)}
+                disabled={disabled}
+                aria-current={activeTab?.id === tab.id ? 'page' : undefined}
+                sx={{ minHeight: 44, textTransform: 'none', fontWeight: 600 }}
+              />
+            );
+
+            if (!disabled) return tabNode;
+
+            return (
+              <Tooltip key={tab.id} title="Создайте сценарий, чтобы открыть раздел">
+                <span>{tabNode}</span>
+              </Tooltip>
+            );
+          })}
+        </Tabs>
+      </Box>
     </Box>
   );
 }
