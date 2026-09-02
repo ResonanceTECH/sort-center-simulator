@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Box,
   IconButton,
@@ -15,7 +15,8 @@ import {
   authSubtitleSx,
   authTitleSx,
 } from '@/styles/authStyles';
-import { OZON } from '@/theme';
+import { LANDING, landingFont } from '@/landing/styles/tokens';
+import { PAGE_MAX_WIDTH } from '@/theme';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -75,133 +76,114 @@ export function AuthLayout({
       sx={{
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 2,
+        flexDirection: 'column',
         position: 'relative',
         overflow: 'hidden',
-        backgroundColor: OZON.white,
+        backgroundColor: LANDING.canvas,
+        fontFamily: landingFont,
       }}
     >
       <Box
         aria-hidden
         sx={{
           position: 'absolute',
-          inset: '-10%',
-          background: `
-            linear-gradient(
-              160deg,
-              rgba(0, 91, 255, 0.12) 0%,
-              rgba(0, 162, 255, 0.08) 50%,
-              rgba(0, 26, 52, 0.04) 100%
-            )
+          inset: 0,
+          backgroundImage: `
+            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 90, 0, 0.08), transparent 55%),
+            linear-gradient(180deg, ${LANDING.snow} 0%, ${LANDING.canvas} 45%, ${LANDING.paper} 100%)
           `,
         }}
+      />
+      <Box
+        aria-hidden
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          opacity: 0.45,
+          backgroundImage: `
+            linear-gradient(${LANDING.cloud} 1px, transparent 1px),
+            linear-gradient(90deg, ${LANDING.cloud} 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px',
+          maskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 75%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 75%)',
+        }}
+      />
+
+      <Box
+        sx={{
+          position: 'relative',
+          zIndex: 1,
+          width: '100%',
+          maxWidth: PAGE_MAX_WIDTH,
+          mx: 'auto',
+          px: { xs: 2.5, sm: 4, md: 5 },
+          py: { xs: 3, md: 4 },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '8%',
-            left: '5%',
-            width: '28%',
-            height: '70%',
-            borderRadius: '16px',
-            background: `linear-gradient(180deg, ${OZON.white} 0%, rgba(0, 91, 255, 0.08) 100%)`,
-            boxShadow: '0 8px 32px rgba(0, 26, 52, 0.12)',
-            opacity: 0.9,
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '12%',
-            right: '8%',
-            width: '55%',
-            height: '18%',
-            borderRadius: '12px',
-            background: OZON.white,
-            boxShadow: '0 4px 20px rgba(0, 26, 52, 0.10)',
-            opacity: 0.85,
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '34%',
-            right: '8%',
-            width: '55%',
-            height: '42%',
-            borderRadius: '12px',
-            background: OZON.white,
-            boxShadow: '0 4px 20px rgba(0, 26, 52, 0.10)',
-            opacity: 0.85,
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: '10%',
-            left: '20%',
-            width: '60%',
-            height: '12%',
-            borderRadius: '12px',
-            background: OZON.white,
-            opacity: 0.7,
-          }}
-        />
         <Typography
+          component={RouterLink}
+          to="/"
           sx={{
-            position: 'absolute',
-            top: '22%',
-            left: '38%',
-            fontSize: '3.5rem',
-            fontWeight: 800,
-            color: 'rgba(0, 91, 255, 0.08)',
-            letterSpacing: '0.05em',
-            userSelect: 'none',
+            fontFamily: landingFont,
+            fontWeight: 600,
+            fontSize: '1rem',
+            color: LANDING.ink,
+            textDecoration: 'none',
+            letterSpacing: '-0.02em',
+            '&:hover': { color: LANDING.ember },
           }}
         >
-          СОРТИРОВОЧНЫЙ ЦЕНТР
+          Конструктор СЦ
         </Typography>
+        <IconButton
+          aria-label="Закрыть"
+          onClick={() => navigate('/')}
+          sx={{
+            color: LANDING.steel,
+            border: `1px solid ${LANDING.border}`,
+            borderRadius: LANDING.radiusButton,
+            bgcolor: LANDING.snow,
+            '&:hover': {
+              backgroundColor: LANDING.subtle,
+              color: LANDING.ink,
+            },
+          }}
+        >
+          <Close sx={{ fontSize: 20 }} />
+        </IconButton>
       </Box>
 
       <Box
         sx={{
-          position: 'absolute',
-          inset: 0,
-          backdropFilter: 'blur(18px)',
-          WebkitBackdropFilter: 'blur(18px)',
-          backgroundColor: AUTH_COLORS.overlay,
+          position: 'relative',
+          zIndex: 1,
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          maxWidth: PAGE_MAX_WIDTH,
+          mx: 'auto',
+          px: { xs: 2.5, sm: 4, md: 5 },
+          pb: { xs: 6, md: 10 },
         }}
-      />
+      >
+        <Paper elevation={0} sx={wide ? authCardWideSx : authCardSx}>
+          <Typography component="h1" sx={authTitleSx}>
+            {title}
+          </Typography>
+          <Typography sx={authSubtitleSx}>{subtitle}</Typography>
 
-      <Paper elevation={0} sx={wide ? authCardWideSx : authCardSx}>
-        <IconButton
-          aria-label="Закрыть"
-          onClick={() => navigate('/login')}
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            color: OZON.morningBlue,
-            '&:hover': {
-              backgroundColor: 'rgba(0, 91, 255, 0.08)',
-              color: OZON.blue,
-            },
-          }}
-        >
-          <Close sx={{ fontSize: 22 }} />
-        </IconButton>
+          <Box sx={{ width: '100%' }}>{children}</Box>
 
-        <Typography component="h1" sx={authTitleSx}>
-          {title}
-        </Typography>
-        <Typography sx={authSubtitleSx}>{subtitle}</Typography>
-
-        <Box sx={{ width: '100%' }}>{children}</Box>
-
-        {footer === null ? null : (footer ?? <DefaultFooter />)}
-      </Paper>
+          {footer === null ? null : (footer ?? <DefaultFooter />)}
+        </Paper>
+      </Box>
     </Box>
   );
 }
