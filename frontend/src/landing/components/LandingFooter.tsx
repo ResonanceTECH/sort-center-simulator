@@ -7,6 +7,7 @@ import EmailOutlined from '@mui/icons-material/EmailOutlined';
 import LanguageOutlined from '@mui/icons-material/LanguageOutlined';
 import PhoneOutlined from '@mui/icons-material/PhoneOutlined';
 import { FOOTER_CONTENT, FOOTER_SOCIAL } from '@/landing/constants/footerContent';
+import { FooterStackBento } from '@/landing/components/FooterStackBento';
 import '@/landing/styles/landingFooter.css';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -48,7 +49,7 @@ function FooterLink({ href, label }: { href: string; label: string }) {
 export function LandingFooter() {
   const footerRef = useRef<HTMLElement>(null);
   const brandRef = useRef<HTMLParagraphElement>(null);
-  const { contact, columns, brandWord } = FOOTER_CONTENT;
+  const { contact, columns, brandWord, stack } = FOOTER_CONTENT;
 
   useGSAP(
     () => {
@@ -126,10 +127,10 @@ export function LandingFooter() {
             </div>
           </div>
 
-          <p className="landing-footer__hint">{contact.hint}</p>
+          <FooterStackBento title={stack.title} />
         </div>
 
-        <div className="landing-footer__links">
+        <div className="landing-footer__aside">
           {columns.map((column) => (
             <div key={column.title}>
               <h3 className="landing-footer__column-title">{column.title}</h3>
