@@ -41,6 +41,8 @@ describe('mappers', () => {
       name: 'Иван',
       email: 'ivan@example.com',
       team: 'SC-1',
+      role: 'SUPPLY_CHAIN_MANAGER',
+      organization: undefined,
     });
   });
 

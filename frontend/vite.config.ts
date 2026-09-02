@@ -18,6 +18,9 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
+    optimizeDeps: {
+      include: ['gsap', 'gsap/ScrollTrigger', '@gsap/react', 'maplibre-gl'],
+    },
     server: {
       port: 3000,
       open: true,

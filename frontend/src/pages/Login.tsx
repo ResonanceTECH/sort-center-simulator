@@ -13,6 +13,7 @@ import {
   Link,
   Snackbar,
 } from '@mui/material';
+import { COMMON } from '@/constants/platformRu';
 import { AuthLayout } from '@/components/AuthLayout';
 import { AuthForm } from '@/components/AuthForm';
 import { AuthTextField } from '@/components/AuthTextField';
@@ -20,6 +21,7 @@ import { PasswordField } from '@/components/PasswordField';
 import { useAuth } from '@/hooks/useAuth';
 import { AUTH_COLORS, pillButtonSx } from '@/styles/authStyles';
 import { LANDING } from '@/landing/styles/tokens';
+import { getDefaultRoute } from '@/types/scm/roles';
 
 const schema = yup.object({
   email: yup
@@ -58,10 +60,10 @@ export function Login() {
     setError(null);
 
     try {
-      await login(data);
+      const user = await login(data);
       setSuccessOpen(true);
       setTimeout(() => {
-        navigate('/projects');
+        navigate(getDefaultRoute(user.role));
       }, 600);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка входа');
@@ -71,7 +73,7 @@ export function Login() {
   return (
     <AuthLayout
       title="Войти"
-      subtitle="Войдите, чтобы продолжить работу с проектами и сценариями"
+      subtitle="Войдите в платформу управления цепочками поставок"
     >
       {error && (
         <Alert severity="error" sx={{ mb: 2, borderRadius: LANDING.radiusButton, width: '100%' }}>
@@ -86,7 +88,7 @@ export function Login() {
           render={({ field }) => (
             <AuthTextField
               {...field}
-              placeholder="Email"
+              placeholder={COMMON.email}
               type="email"
               autoComplete="email"
               error={Boolean(errors.email)}

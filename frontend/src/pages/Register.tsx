@@ -13,6 +13,7 @@ import {
   Link,
   Snackbar,
 } from '@mui/material';
+import { COMMON, NAV_LABELS } from '@/constants/platformRu';
 import { AuthLayout } from '@/components/AuthLayout';
 import { AuthForm } from '@/components/AuthForm';
 import { AuthTextField } from '@/components/AuthTextField';
@@ -20,6 +21,7 @@ import { PasswordField } from '@/components/PasswordField';
 import { useAuth } from '@/hooks/useAuth';
 import { AUTH_COLORS, pillButtonSx, registerFieldsGridSx } from '@/styles/authStyles';
 import { LANDING } from '@/landing/styles/tokens';
+import { getDefaultRoute } from '@/types/scm/roles';
 
 const schema = yup.object({
   name: yup
@@ -76,13 +78,13 @@ export function Register() {
     setError(null);
 
     try {
-      await registerUser({
+      const user = await registerUser({
         ...data,
         team: data.team || undefined,
       });
       setSuccessOpen(true);
       setTimeout(() => {
-        navigate('/projects');
+        navigate(getDefaultRoute(user.role));
       }, 600);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка регистрации');
@@ -93,7 +95,7 @@ export function Register() {
     <AuthLayout
       wide
       title="Создать аккаунт"
-      subtitle="Зарегистрируйтесь, чтобы создавать модели и сравнивать сценарии"
+      subtitle={`Создайте аккаунт для работы с ${NAV_LABELS.controlTower}, планированием и исполнением`}
     >
       {error && (
         <Alert severity="error" sx={{ mb: 2, borderRadius: LANDING.radiusButton, width: '100%' }}>
@@ -124,7 +126,7 @@ export function Register() {
             render={({ field }) => (
               <AuthTextField
                 {...field}
-                placeholder="Email"
+                placeholder={COMMON.email}
                 type="email"
                 autoComplete="email"
                 error={Boolean(errors.email)}

@@ -1,8 +1,12 @@
+import type { AppRole } from '@/types/scm/roles';
+
 export interface User {
   id: string;
   name: string;
   email: string;
   team?: string;
+  role: AppRole;
+  organization?: string;
 }
 
 export interface LoginData {
@@ -30,6 +34,8 @@ export interface UserApiResponse {
   name: string;
   email: string;
   team?: string;
+  role?: AppRole;
+  organization?: string;
 }
 
 export interface AuthApiResponse {
@@ -38,8 +44,14 @@ export interface AuthApiResponse {
   token?: string;
 }
 
-export interface StoredUser extends User {
+export interface StoredUser {
+  id: string;
+  name: string;
+  email: string;
   password: string;
+  team?: string;
+  role: AppRole;
+  organization?: string;
 }
 
 export type PasswordStrength = 'weak' | 'medium' | 'strong';

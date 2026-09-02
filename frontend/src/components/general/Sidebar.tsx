@@ -1,5 +1,8 @@
+import { useMemo, useState } from 'react';
 import {
+  Badge,
   Box,
+  Collapse,
   Drawer,
   List,
   ListItemButton,
@@ -9,12 +12,24 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { NAV_BOTTOM_ITEMS, NAV_ITEMS } from '@/constants/navigation';
+import {
+  APP_BRAND,
+  CARRIER_NAV_ITEMS,
+  INTERNAL_NAV_GROUPS,
+  SUPPLIER_NAV_ITEMS,
+  type NavGroupConfig,
+  type NavItemConfig,
+} from '@/constants/navigation';
+import { canAccessRoute } from '@/constants/routePermissions';
 import { NavIcon } from '@/components/general/NavIcon';
+import { useControlTowerQuery } from '@/hooks/scm/useScmQueries';
+import { usePermissions } from '@/hooks/usePermissions';
 import { useUiStore } from '@/store/uiStore';
 import { LANDING, landingFont } from '@/landing/styles/tokens';
 import { SIDEBAR_WIDTH } from '@/theme';
+import type { AppShell } from '@/types/scm/roles';
 
 function LogoMark() {
   return (
@@ -25,69 +40,96 @@ function LogoMark() {
         borderRadius: LANDING.radiusBadge,
         bgcolor: LANDING.obsidian,
         border: '1.5px solid #2c2e34',
-        boxShadow: LANDING.shadowPrimary,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
       }}
     >
-      <Box
-        sx={{
-          width: 10,
-          height: 10,
-          borderRadius: '2px',
-          bgcolor: LANDING.ember,
-        }}
-      />
+      <Box sx={{ width: 10, height: 10, borderRadius: '2px', bgcolor: LANDING.ember }} />
     </Box>
   );
 }
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+function filterNavItem(item: NavItemConfig, role: ReturnType<typeof usePermissions>['role']): boolean {
+  if (item.roles && role && !item.roles.includes(role)) return false;
+  return canAccessRoute(role, item.path);
+}
+
+function filterNavGroup(group: NavGroupConfig, role: ReturnType<typeof usePermissions>['role']): NavGroupConfig | null {
+  if (group.roles && role && !group.roles.some((r) => r === role)) return null;
+  const items = group.items.filter((item) => filterNavItem(item, role));
+  if (items.length === 0) return null;
+  return { ...group, items };
+}
+
+interface SidebarContentProps {
+  shell: AppShell;
+  onNavigate?: () => void;
+}
+
+function SidebarContent({ shell, onNavigate }: SidebarContentProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { role } = usePermissions();
+  const { data: towerData } = useControlTowerQuery();
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
+  const groups = useMemo(() => {
+    if (shell === 'supplier') return null;
+    if (shell === 'carrier') return null;
+    return INTERNAL_NAV_GROUPS.map((g) => filterNavGroup(g, role)).filter(Boolean) as NavGroupConfig[];
+  }, [shell, role]);
+
+  const flatItems = shell === 'supplier' ? SUPPLIER_NAV_ITEMS : shell === 'carrier' ? CARRIER_NAV_ITEMS : null;
 
   const handleNav = (path: string) => {
     navigate(path);
     onNavigate?.();
   };
 
-  const renderItems = (items: typeof NAV_ITEMS) =>
-    items.map((item) => {
-      const active =
-        location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
-      return (
-        <ListItemButton
-          key={item.id}
-          onClick={() => handleNav(item.path)}
-          sx={{
-            borderRadius: LANDING.radiusButton,
-            mb: 0.25,
-            py: 1,
-            px: 1.5,
-            transition: 'background-color 0.18s ease',
-            bgcolor: active ? LANDING.paper : 'transparent',
-            borderLeft: active ? `3px solid ${LANDING.ember}` : '3px solid transparent',
-            '&:hover': {
-              bgcolor: active ? LANDING.paper : LANDING.subtle,
-            },
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
+
+  const getBadge = (key?: NavItemConfig['badgeKey']) => {
+    if (!key || !towerData) return 0;
+    return key === 'exceptions' ? towerData.alertCounts.exceptions : towerData.alertCounts.incidents;
+  };
+
+  const renderItem = (item: NavItemConfig) => {
+    const active = isActive(item.path);
+    const badge = getBadge(item.badgeKey);
+    return (
+      <ListItemButton
+        key={item.id}
+        onClick={() => handleNav(item.path)}
+        sx={{
+          borderRadius: LANDING.radiusButton,
+          mb: 0.25,
+          py: 0.875,
+          px: 1.5,
+          bgcolor: active ? LANDING.paper : 'transparent',
+          borderLeft: active ? `3px solid ${LANDING.ember}` : '3px solid transparent',
+          '&:hover': { bgcolor: active ? LANDING.paper : LANDING.subtle },
+        }}
+      >
+        <ListItemIcon sx={{ minWidth: 32, color: active ? LANDING.ink : LANDING.steel }}>
+          <NavIcon name={item.icon} />
+        </ListItemIcon>
+        <ListItemText
+          primary={item.label}
+          primaryTypographyProps={{
+            fontSize: '0.8125rem',
+            fontWeight: active ? 600 : 400,
+            color: active ? LANDING.ink : LANDING.body,
           }}
-        >
-          <ListItemIcon sx={{ minWidth: 36, color: active ? LANDING.ink : LANDING.steel }}>
-            <NavIcon name={item.icon} />
-          </ListItemIcon>
-          <ListItemText
-            primary={item.label}
-            primaryTypographyProps={{
-              fontSize: '0.8125rem',
-              fontWeight: active ? 600 : 400,
-              color: active ? LANDING.ink : LANDING.body,
-            }}
-          />
-        </ListItemButton>
-      );
-    });
+        />
+        {badge > 0 && (
+          <Badge badgeContent={badge} color="error" sx={{ mr: 0.5 }} />
+        )}
+      </ListItemButton>
+    );
+  };
 
   return (
     <Box
@@ -98,32 +140,76 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         bgcolor: LANDING.snow,
         borderRight: `1px solid ${LANDING.border}`,
         fontFamily: landingFont,
+        overflow: 'auto',
       }}
     >
       <Box sx={{ px: 2, py: 2.5, display: 'flex', alignItems: 'center', gap: 1.5 }}>
         <LogoMark />
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: 600,
-            lineHeight: 1.3,
-            fontSize: '0.875rem',
-            color: LANDING.ink,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          Конструктор СЦ
+        <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8125rem', color: LANDING.ink, lineHeight: 1.3 }}>
+          {APP_BRAND[shell]}
         </Typography>
       </Box>
 
-      <List sx={{ flex: 1, px: 1.5, py: 0 }}>{renderItems(NAV_ITEMS)}</List>
+      <List sx={{ flex: 1, px: 1.5, py: 0 }}>
+        {flatItems?.map(renderItem)}
 
-      <Box sx={{ px: 1.5, pb: 2 }}>{renderItems(NAV_BOTTOM_ITEMS)}</Box>
+        {groups?.map((group) => {
+          const open = collapsed[group.id] ?? true;
+          const hasActive = group.items.some((item) => isActive(item.path));
+
+          return (
+            <Box key={group.id} sx={{ mb: 1 }}>
+              {group.collapsible ? (
+                <>
+                  <ListItemButton
+                    onClick={() => setCollapsed((s) => ({ ...s, [group.id]: !open }))}
+                    sx={{ borderRadius: LANDING.radiusButton, py: 0.75, px: 1.5 }}
+                  >
+                    <ListItemText
+                      primary={group.label}
+                      primaryTypographyProps={{
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        color: LANDING.muted,
+                      }}
+                    />
+                    {open ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
+                  </ListItemButton>
+                  <Collapse in={open || hasActive}>{group.items.map(renderItem)}</Collapse>
+                </>
+              ) : (
+                <>
+                  <Typography
+                    sx={{
+                      px: 1.5,
+                      py: 1,
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: LANDING.muted,
+                    }}
+                  >
+                    {group.label}
+                  </Typography>
+                  {group.items.map(renderItem)}
+                </>
+              )}
+            </Box>
+          );
+        })}
+      </List>
     </Box>
   );
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  shell?: AppShell;
+}
+
+export function Sidebar({ shell = 'internal' }: SidebarProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { sidebarOpen, setSidebarOpen } = useUiStore();
@@ -142,7 +228,7 @@ export function Sidebar() {
           },
         }}
       >
-        <SidebarContent onNavigate={() => setSidebarOpen(false)} />
+        <SidebarContent shell={shell} onNavigate={() => setSidebarOpen(false)} />
       </Drawer>
     );
   }
@@ -160,7 +246,7 @@ export function Sidebar() {
         zIndex: theme.zIndex.drawer,
       }}
     >
-      <SidebarContent />
+      <SidebarContent shell={shell} />
     </Box>
   );
 }

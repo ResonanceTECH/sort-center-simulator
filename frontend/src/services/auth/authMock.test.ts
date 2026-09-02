@@ -39,9 +39,11 @@ describe('authMock', () => {
 
     await expect(getCurrentUserMock(token)).resolves.toEqual({
       id: 'demo-1',
-      name: 'Демо Пользователь',
+      name: 'Анна Смирнова',
       email: 'demo@sortcenter.ru',
-      team: 'Сортировочный центр №1',
+      team: 'Supply Chain',
+      role: 'SUPPLY_CHAIN_MANAGER',
+      organization: 'Logus Nova',
     });
   });
 });

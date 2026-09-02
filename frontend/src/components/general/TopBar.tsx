@@ -7,49 +7,58 @@ import {
   Box,
   Divider,
   IconButton,
-  InputAdornment,
-  ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
-  TextField,
   Toolbar,
   Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import {
-  KeyboardArrowDown,
-  Menu as MenuIcon,
-  NotificationsOutlined,
-  Search,
-} from '@mui/icons-material';
+import { KeyboardArrowDown, Menu as MenuIcon, NotificationsOutlined } from '@mui/icons-material';
+import { GlobalSearch } from '@/components/common/GlobalSearch';
 import { useAuth } from '@/hooks/useAuth';
 import { useUiStore } from '@/store/uiStore';
 import { LANDING } from '@/landing/styles/tokens';
+import { ROLE_LABELS } from '@/types/scm/roles';
 import type { Notification } from '@/types/general';
+import type { ScmNotification } from '@/types/scm/search';
 
-interface TopBarProps {
-  notifications: Notification[];
+export type TopBarNotification = Notification | ScmNotification;
+
+function hasLink(n: TopBarNotification): n is ScmNotification {
+  return 'link' in n && typeof (n as ScmNotification).link === 'string';
 }
 
-export function TopBar({ notifications }: TopBarProps) {
+interface TopBarProps {
+  notifications?: TopBarNotification[];
+  alertCounts?: { exceptions: number; incidents: number };
+}
+
+export function TopBar({ notifications = [], alertCounts }: TopBarProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { searchQuery, setSearchQuery, toggleSidebar } = useUiStore();
+  const { toggleSidebar } = useUiStore();
 
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const [notifAnchor, setNotifAnchor] = useState<null | HTMLElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
-  const displayName = user?.name ?? 'Демо Пользователь';
+  const displayName = user?.name ?? 'Пользователь';
+  const roleLabel = user?.role ? ROLE_LABELS[user.role] : '';
+  const orgLabel = user?.organization ?? user?.team ?? '';
 
   const handleLogout = () => {
     setProfileAnchor(null);
     logout();
     navigate('/login');
+  };
+
+  const handleNotificationClick = (n: TopBarNotification) => {
+    setNotifAnchor(null);
+    if (hasLink(n)) navigate(n.link);
   };
 
   return (
@@ -69,33 +78,11 @@ export function TopBar({ notifications }: TopBarProps) {
           </IconButton>
         )}
 
-        <TextField
-          placeholder="Поиск по проектам, сценариям и отчётам..."
-          size="small"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{
-            flex: 1,
-            maxWidth: { md: 480 },
-            '& .MuiOutlinedInput-root': {
-              borderRadius: LANDING.radiusButton,
-              bgcolor: LANDING.paper,
-              fontSize: '0.875rem',
-            },
-          }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Search sx={{ color: LANDING.fog, fontSize: 20 }} />
-              </InputAdornment>
-            ),
-          }}
-          inputProps={{ 'aria-label': 'Поиск по проектам, сценариям и отчётам' }}
-        />
+        <GlobalSearch />
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
           <IconButton onClick={(e) => setNotifAnchor(e.currentTarget)} aria-label="Уведомления">
-            <Badge badgeContent={unreadCount} color="secondary">
+            <Badge badgeContent={(alertCounts?.exceptions ?? 0) + unreadCount} color="error">
               <NotificationsOutlined />
             </Badge>
           </IconButton>
@@ -130,13 +117,11 @@ export function TopBar({ notifications }: TopBarProps) {
                   {displayName}
                 </Typography>
                 <Typography variant="caption" sx={{ color: LANDING.muted }}>
-                  Руководитель проекта
+                  {roleLabel}{orgLabel ? ` · ${orgLabel}` : ''}
                 </Typography>
               </Box>
             )}
-            {!isMobile && (
-              <KeyboardArrowDown sx={{ color: LANDING.fog, fontSize: 18 }} />
-            )}
+            {!isMobile && <KeyboardArrowDown sx={{ color: LANDING.fog, fontSize: 18 }} />}
           </Box>
         </Box>
 
@@ -156,11 +141,14 @@ export function TopBar({ notifications }: TopBarProps) {
             <MenuItem disabled>Нет уведомлений</MenuItem>
           ) : (
             notifications.map((n) => (
-              <MenuItem key={n.id} onClick={() => setNotifAnchor(null)}>
+              <MenuItem key={n.id} onClick={() => handleNotificationClick(n)}>
                 <ListItemText
                   primary={n.title}
                   secondary={n.message}
-                  primaryTypographyProps={{ fontSize: '0.8125rem', fontWeight: 600 }}
+                  primaryTypographyProps={{
+                    fontSize: '0.8125rem',
+                    fontWeight: n.read ? 400 : 700,
+                  }}
                   secondaryTypographyProps={{ fontSize: '0.75rem' }}
                 />
               </MenuItem>
@@ -168,34 +156,14 @@ export function TopBar({ notifications }: TopBarProps) {
           )}
         </Menu>
 
-        <Menu
-          anchorEl={profileAnchor}
-          open={Boolean(profileAnchor)}
-          onClose={() => setProfileAnchor(null)}
-        >
-          <MenuItem onClick={() => setProfileAnchor(null)}>
-            <ListItemIcon>
-              <Avatar
-                sx={{
-                  width: 24,
-                  height: 24,
-                  fontSize: '0.75rem',
-                  bgcolor: LANDING.obsidian,
-                  color: LANDING.snow,
-                }}
-              >
-                {displayName.charAt(0)}
-              </Avatar>
-            </ListItemIcon>
-            <ListItemText primary="Профиль" />
-          </MenuItem>
+        <Menu anchorEl={profileAnchor} open={Boolean(profileAnchor)} onClose={() => setProfileAnchor(null)}>
           <MenuItem
             onClick={() => {
               setProfileAnchor(null);
               navigate('/settings');
             }}
           >
-            <ListItemText primary="Настройки" />
+            <ListItemText primary="Профиль и настройки" />
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>
