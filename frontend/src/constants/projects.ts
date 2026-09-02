@@ -93,7 +93,7 @@ export const STATUS_CONFIG: Record<
 };
 
 export const RUN_STATUS_CONFIG: Record<
-  'queued' | 'running' | 'completed' | 'failed',
+  'queued' | 'running' | 'completed' | 'completed_with_warnings' | 'failed',
   { label: string; color: string; bg: string; border: string }
 > = {
   queued: {
@@ -113,6 +113,12 @@ export const RUN_STATUS_CONFIG: Record<
     color: PROJECTS_PAGE.success,
     bg: PROJECTS_PAGE.successBg,
     border: PROJECTS_PAGE.successBorder,
+  },
+  completed_with_warnings: {
+    label: 'Завершён с замечаниями',
+    color: PROJECTS_PAGE.warning,
+    bg: '#FFFAEB',
+    border: '#FEDF89',
   },
   failed: {
     label: 'Ошибка',
