@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { App } from '@/App';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { AppSnackbar } from '@/components/shared/AppSnackbar';
 import { AuthProvider } from '@/context/AuthProvider';
 import { theme } from '@/theme';
 import '@/styles/tokens.css';
@@ -22,6 +23,7 @@ createRoot(rootElement).render(
         <AuthProvider>
           <ErrorBoundary>
             <App />
+            <AppSnackbar />
           </ErrorBoundary>
         </AuthProvider>
       </BrowserRouter>

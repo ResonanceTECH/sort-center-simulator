@@ -24,6 +24,7 @@ export const FOOTER_CONTENT = {
       title: 'Ресурсы',
       links: [
         { label: 'Документация API', href: 'http://localhost:8000/docs' },
+        { label: 'UI Kit', href: '/ui-kit' },
         { label: 'Демо-проект', href: '/register' },
         { label: 'GitHub', href: '#' },
         { label: 'Logus Nova', href: '#hero' },

@@ -13,6 +13,7 @@ import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { Projects } from '@/pages/Projects';
 import { Reports } from '@/pages/Reports';
 import { Register } from '@/pages/Register';
+import { UiKitPage } from '@/pages/UiKitPage';
 import { JoinProjectPage } from '@/pages/project/JoinProjectPage';
 import { ProjectMembersPage } from '@/pages/project/ProjectMembersPage';
 import { ProjectOverviewPage } from '@/pages/project/ProjectOverviewPage';
@@ -62,6 +63,7 @@ export function App() {
       <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/ui-kit" element={<UiKitPage />} />
       <Route path="/projects/join" element={<JoinProjectPage />} />
 
       <Route element={<ProtectedRoute />}>

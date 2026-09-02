@@ -334,21 +334,71 @@ export const theme = createTheme({
     },
     MuiAlert: {
       styleOverrides: {
+        root: {
+          fontFamily: landingFont,
+          fontSize: '0.9375rem',
+          fontWeight: 400,
+          alignItems: 'center',
+          boxShadow: 'none',
+        },
+        filled: {
+          borderRadius: LANDING.radiusButton,
+          border: `1px solid ${LANDING.border}`,
+          backgroundColor: LANDING.snow,
+          color: LANDING.body,
+          boxShadow: '0 12px 32px rgba(9, 9, 11, 0.08)',
+          padding: '10px 16px',
+          '& .MuiAlert-icon': {
+            marginRight: 10,
+            padding: 0,
+            opacity: 1,
+            fontSize: 22,
+          },
+          '& .MuiAlert-message': {
+            padding: 0,
+            paddingRight: 8,
+            color: LANDING.body,
+          },
+          '& .MuiAlert-action': {
+            paddingTop: 0,
+            paddingRight: 0,
+            marginRight: 0,
+            alignItems: 'center',
+            '& .MuiIconButton-root': {
+              color: LANDING.fog,
+              '&:hover': {
+                color: LANDING.ink,
+                backgroundColor: LANDING.paper,
+              },
+            },
+          },
+        },
         filledInfo: {
-          backgroundColor: LANDING.obsidian,
-          color: LANDING.snow,
+          backgroundColor: LANDING.snow,
+          color: LANDING.body,
+          '& .MuiAlert-icon': { color: LANDING.obsidian },
         },
         filledSuccess: {
-          backgroundColor: '#3f7d4e',
-          color: LANDING.snow,
+          backgroundColor: LANDING.snow,
+          color: LANDING.body,
+          '& .MuiAlert-icon': { color: '#3f7d4e' },
         },
         filledWarning: {
-          backgroundColor: LANDING.ember,
-          color: LANDING.snow,
+          backgroundColor: LANDING.snow,
+          color: LANDING.body,
+          '& .MuiAlert-icon': { color: LANDING.ember },
         },
         filledError: {
-          backgroundColor: LANDING.ink,
-          color: LANDING.snow,
+          backgroundColor: LANDING.snow,
+          color: LANDING.body,
+          '& .MuiAlert-icon': { color: LANDING.ink },
+        },
+        standard: {
+          borderRadius: LANDING.radiusButton,
+          '& .MuiAlert-icon': { opacity: 1 },
+          '& .MuiAlert-action .MuiIconButton-root': {
+            color: LANDING.fog,
+          },
         },
         standardError: {
           backgroundColor: LANDING.paper,

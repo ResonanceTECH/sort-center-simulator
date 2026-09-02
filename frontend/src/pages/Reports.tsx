@@ -1,7 +1,6 @@
 import { useDeferredValue, useState } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import { AppLayout } from '@/layouts/AppLayout';
-import { AppSnackbar } from '@/components/shared/AppSnackbar';
 import { TopBar } from '@/components/general/TopBar';
 import { ReportsHeader } from '@/components/reports/ReportsHeader';
 import { ReportsToolbar } from '@/components/reports/ReportsToolbar';
@@ -104,8 +103,6 @@ export function Reports() {
           )}
         </Box>
       )}
-
-      <AppSnackbar />
     </AppLayout>
   );
 }
