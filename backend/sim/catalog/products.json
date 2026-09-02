@@ -1,0 +1,15 @@
+{
+  "products": [
+    { "id": "box_300", "display_name": "Коробка 300x200x200", "mesh_file": "box_300.stl", "mass_kg": 1.0 },
+    { "id": "detergent", "display_name": "Моющее средство", "mesh_file": "detergent.stl", "mass_kg": 0.8 },
+    { "id": "lunchbox", "display_name": "Ланчбокс", "mesh_file": "lunchbox.stl", "mass_kg": 0.3 },
+    { "id": "box_400", "display_name": "Коробка 400x400x300", "mesh_file": "box_400.stl", "mass_kg": 4.0 },
+    { "id": "pen", "display_name": "Ручка", "mesh_file": "pen.stl", "mass_kg": 0.02 },
+    { "id": "pouf", "display_name": "Пуфик", "mesh_file": "pouf.stl", "mass_kg": 2.5 },
+    { "id": "bag", "display_name": "Мешок", "mesh_file": "bag.stl", "mass_kg": 0.2 },
+    { "id": "bottle", "display_name": "Бутылка", "mesh_file": "bottle.stl", "mass_kg": 0.4 },
+    { "id": "cylinder", "display_name": "Цилиндр", "mesh_file": "cylinder.stl", "mass_kg": 0.5 },
+    { "id": "helmet", "display_name": "Шлем", "mesh_file": "helmet.stl", "mass_kg": 0.6 },
+    { "id": "plate", "display_name": "Тарелка", "mesh_file": "plate.stl", "mass_kg": 0.25 }
+  ]
+}
