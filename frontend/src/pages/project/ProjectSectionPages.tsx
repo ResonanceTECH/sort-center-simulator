@@ -1,6 +1,6 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
+import { WorkspacePageHeader } from '@/components/project/WorkspacePageHeader';
 import { useProjectContext } from '@/context/projectContext';
-import { useScenarioContext } from '@/context/scenarioContext';
 
 interface ProjectSectionPlaceholderProps {
   title: string;
@@ -15,48 +15,20 @@ export function ProjectSectionPlaceholder({
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight={700} mb={0.5}>
-        {title}
-      </Typography>
-      <Typography color="text.secondary" mb={2}>
-        {subtitle ?? `Проект «${project.name}». Раздел в разработке.`}
-      </Typography>
+      <WorkspacePageHeader
+        title={title}
+        subtitle={subtitle ?? `Проект «${project.name}». Раздел в разработке.`}
+        mb={2}
+      />
     </Box>
   );
 }
 
-export function ScenarioEditorPage() {
-  const { scenario } = useScenarioContext();
-  return (
-    <ProjectSectionPlaceholder
-      title="Редактор"
-      subtitle={`Сценарий «${scenario.name}». Раздел в разработке.`}
-    />
-  );
-}
-
-export function ScenarioParametersPage() {
-  const { scenario } = useScenarioContext();
-  return (
-    <ProjectSectionPlaceholder
-      title="Параметры"
-      subtitle={`Сценарий «${scenario.name}». Раздел в разработке.`}
-    />
-  );
-}
-
-export function ProjectRunsPage() {
-  return <ProjectSectionPlaceholder title="Прогоны" />;
-}
-
-export function ProjectStatisticsPage() {
-  return <ProjectSectionPlaceholder title="Статистика" />;
-}
-
-export function ProjectVisualizationPage() {
-  return <ProjectSectionPlaceholder title="Визуализация" />;
-}
-
-export function ProjectComparisonPage() {
-  return <ProjectSectionPlaceholder title="Сравнение" />;
-}
+export { ScenarioEditorPage } from '@/pages/project/ScenarioEditorPage';
+export { ScenarioParametersPage } from '@/pages/project/ScenarioParametersPage';
+export { ProjectRunsPage } from '@/pages/project/ProjectRunsPage';
+export { ProjectStatisticsPage } from '@/pages/project/ProjectStatisticsPage';
+export { ProjectVisualizationPage } from '@/pages/project/ProjectVisualizationPage';
+export { ProjectComparisonPage } from '@/pages/project/ProjectComparisonPage';
+export { ProjectScenariosPage } from '@/pages/project/ProjectScenariosPage';
+export { ProjectSimulationPage } from '@/pages/project/ProjectSimulationPage';
