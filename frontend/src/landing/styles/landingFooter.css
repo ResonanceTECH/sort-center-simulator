@@ -82,6 +82,7 @@
   border-radius: 20px;
   border: 1px solid var(--color-cloud, #ececee);
   background: var(--color-snow, #ffffff);
+  overflow: visible;
 }
 
 .landing-footer__stack-title {
@@ -96,9 +97,11 @@
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 6px;
+  overflow: visible;
 }
 
 .landing-footer__stack-cell {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -107,6 +110,7 @@
   border: 1px solid var(--color-cloud, #ececee);
   background: var(--color-paper, #f4f4f5);
   color: var(--color-steel, #52525b);
+  cursor: default;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
@@ -118,6 +122,65 @@
   background: var(--color-snow, #ffffff);
   border-color: var(--color-mist, #d4d4d8);
   color: var(--color-obsidian, #09090b);
+  z-index: 2;
+}
+
+.landing-footer__stack-cell::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: var(--color-obsidian, #09090b);
+  color: var(--color-snow, #ffffff);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s ease;
+  box-shadow: 0 8px 20px rgba(9, 9, 11, 0.16);
+  z-index: 3;
+}
+
+.landing-footer__stack-cell::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  transform: translateX(-50%) translateY(4px);
+  border: 5px solid transparent;
+  border-top-color: var(--color-obsidian, #09090b);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s ease;
+  z-index: 3;
+}
+
+.landing-footer__stack-cell:hover::before,
+.landing-footer__stack-cell:focus-visible::before,
+.landing-footer__stack-cell:hover::after,
+.landing-footer__stack-cell:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.landing-footer__stack-cell:focus-visible {
+  outline: 2px solid var(--color-obsidian, #09090b);
+  outline-offset: 2px;
 }
 
 .landing-footer__aside {

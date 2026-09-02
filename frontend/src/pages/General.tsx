@@ -1,5 +1,4 @@
 import { AppLayout } from '@/layouts/AppLayout';
-import { AppSnackbar } from '@/components/shared/AppSnackbar';
 import { RetryAlert } from '@/components/shared/RetryAlert';
 import { GeneralContent } from '@/components/general/GeneralContent';
 import { GeneralSkeleton } from '@/components/general/GeneralSkeleton';
@@ -18,7 +17,6 @@ export function General() {
       {loading && <GeneralSkeleton />}
       {error && !loading && <RetryAlert message={error} onRetry={retry} />}
       {data && !loading && <GeneralContent data={data} searchQuery={searchQuery} />}
-      <AppSnackbar />
     </AppLayout>
   );
 }

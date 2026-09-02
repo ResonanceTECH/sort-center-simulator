@@ -19,7 +19,9 @@ export function FooterStackBento({ title }: FooterStackBentoProps) {
             ]
               .filter(Boolean)
               .join(' ')}
-            title={item.name}
+            data-tooltip={item.name}
+            aria-label={item.name}
+            tabIndex={0}
           >
             <FooterStackIcon id={item.icon} />
           </div>

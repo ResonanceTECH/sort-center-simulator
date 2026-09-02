@@ -1,6 +1,5 @@
-import { Alert, Button } from '@mui/material';
-import WarningAmberOutlined from '@mui/icons-material/WarningAmberOutlined';
-import { OZON } from '@/theme';
+import { Button } from '@mui/material';
+import { KitAlert, kit } from '@/ui-kit';
 
 interface RetryAlertProps {
   message: string;
@@ -9,27 +8,28 @@ interface RetryAlertProps {
 
 export function RetryAlert({ message, onRetry }: RetryAlertProps) {
   return (
-    <Alert
+    <KitAlert
       severity="error"
-      icon={<WarningAmberOutlined />}
+      variant="inline"
       action={
         <Button
           size="small"
           onClick={onRetry}
-          sx={{ color: OZON.white, bgcolor: OZON.darkSpace, '&:hover': { bgcolor: OZON.darkSpace } }}
+          sx={{
+            color: kit.color.snow,
+            bgcolor: kit.color.ink,
+            px: 1.5,
+            borderRadius: kit.radius.button,
+            textTransform: 'none',
+            '&:hover': { bgcolor: kit.color.graphite },
+          }}
         >
           Повторить
         </Button>
       }
-      sx={{
-        mb: 3,
-        bgcolor: 'rgba(9, 9, 11, 0.08)',
-        color: OZON.darkSpace,
-        border: `1px solid ${OZON.darkSpace}`,
-        '& .MuiAlert-icon': { color: OZON.darkSpace },
-      }}
+      sx={{ mb: 3 }}
     >
       {message}
-    </Alert>
+    </KitAlert>
   );
 }

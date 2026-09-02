@@ -1,4 +1,5 @@
-import { Alert, Snackbar } from '@mui/material';
+import { Snackbar } from '@mui/material';
+import { KitAlert } from '@/ui-kit';
 import { useUiStore } from '@/store/uiStore';
 
 export function AppSnackbar() {
@@ -8,12 +9,15 @@ export function AppSnackbar() {
     <Snackbar
       open={snackbar.open}
       autoHideDuration={3000}
-      onClose={hideSnackbar}
+      onClose={(_, reason) => {
+        if (reason === 'clickaway') return;
+        hideSnackbar();
+      }}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
     >
-      <Alert severity={snackbar.severity} variant="filled" onClose={hideSnackbar}>
+      <KitAlert severity={snackbar.severity} variant="toast" onClose={hideSnackbar}>
         {snackbar.message}
-      </Alert>
+      </KitAlert>
     </Snackbar>
   );
 }

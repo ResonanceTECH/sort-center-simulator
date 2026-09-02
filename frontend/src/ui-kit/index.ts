@@ -31,5 +31,8 @@ export type { KitContainerProps, KitPageHeaderProps } from '@/ui-kit/Layout';
 export { KitEmptyState } from '@/ui-kit/EmptyState';
 export type { KitEmptyStateProps } from '@/ui-kit/EmptyState';
 
+export { KitAlert } from '@/ui-kit/Alert';
+export type { KitAlertProps, KitAlertSeverity, KitAlertVariant } from '@/ui-kit/Alert';
+
 export { KitDivider, KitSection } from '@/ui-kit/Section';
 export type { KitDividerProps, KitSectionProps } from '@/ui-kit/Section';

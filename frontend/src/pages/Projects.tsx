@@ -2,9 +2,7 @@ import { useDeferredValue, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { AppLayout } from '@/layouts/AppLayout';
-import { AppSnackbar } from '@/components/shared/AppSnackbar';
-import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
-import { ProjectsContent } from '@/components/projects/ProjectsContent';
+import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';import { ProjectsContent } from '@/components/projects/ProjectsContent';
 import {
   ProjectsError,
   ProjectsSkeleton,
@@ -185,8 +183,6 @@ export function Projects() {
         onClose={handleCloseCreate}
         onSubmit={handleCreateSubmit}
       />
-
-      <AppSnackbar />
     </AppLayout>
   );
 }

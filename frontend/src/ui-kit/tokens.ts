@@ -39,8 +39,23 @@ export const kit = {
     input: '14px',
   },
   space: {
+    /** Named scale (px) — use for layout rhythm */
+    0: 0,
+    1: 4,
+    2: 8,
+    3: 12,
+    4: 16,
+    5: 20,
+    6: 24,
+    7: 28,
+    8: 32,
+    9: 40,
+    10: 48,
+    11: 64,
+    12: 80,
     sectionGap: 80,
     cardPadding: 28,
+    /** MUI spacing units for KitContainer / page gutters */
     pageX: { xs: 2.5, sm: 4, md: 5 },
   },
   layout: {
@@ -51,6 +66,23 @@ export const kit = {
     primary:
       'inset 0 0.5px 0 0 rgba(255,255,255,0.5), inset 0 9px 14px -5px rgba(117,123,133,0.4), 0 0 0 1.5px rgb(44,46,52), 0 4px 6px 0 rgba(0,0,0,0.14)',
     soft: '0 12px 32px rgba(9, 9, 11, 0.08)',
+    small: '0 2px 8px rgba(9, 9, 11, 0.06)',
+    medium: '0 8px 24px rgba(9, 9, 11, 0.08)',
+    large: '0 16px 40px rgba(9, 9, 11, 0.12)',
+  },
+  border: {
+    hairline: `1px solid #ececee`,
+    strong: `1px solid #d4d4d8`,
+    focus: `1px solid #09090b`,
+    accent: `1.5px solid #2c2e34`,
+  },
+  size: {
+    controlSm: 36,
+    controlMd: 44,
+    controlLg: 52,
+    iconSm: 16,
+    iconMd: 20,
+    iconLg: 24,
   },
   font: {
     sans: '"OS Studio Grotesk", "DM Sans", ui-sans-serif, system-ui, -apple-system, sans-serif',
