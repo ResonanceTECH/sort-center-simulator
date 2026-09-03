@@ -26,6 +26,9 @@ class UserResponse(BaseModel):
     name: str
     email: str
     team: Optional[str] = None
+    organization_id: Optional[str] = None
+    roles: list[str] = []
+    role: Optional[str] = None
 
 
 class AuthResponse(BaseModel):
