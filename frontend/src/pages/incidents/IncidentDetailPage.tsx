@@ -7,7 +7,7 @@ import { EntityStates } from '@/components/common/EntityStates';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StatusChip } from '@/components/status/StatusChip';
 import { COMMON, SECTION_LABELS } from '@/constants/platformRu';
-import { useResolveIncidentMutation } from '@/hooks/scm/useScmMutations';
+import { useAddIncidentCommentMutation, useResolveIncidentMutation } from '@/hooks/scm/useScmMutations';
 import { useIncidentQuery } from '@/hooks/scm/useScmQueries';
 import { InternalLayout } from '@/layouts/InternalLayout';
 import { KitButton } from '@/ui-kit/Button';
@@ -20,7 +20,18 @@ export function IncidentDetailPage() {
   const navigate = useNavigate();
   const { data, isLoading, error, refetch } = useIncidentQuery(incidentId);
   const resolveIncident = useResolveIncidentMutation();
+  const addComment = useAddIncidentCommentMutation();
   const [confirmResolve, setConfirmResolve] = useState(false);
+  const [commentText, setCommentText] = useState('');
+
+  const handleAddComment = () => {
+    const message = commentText.trim();
+    if (!message) return;
+    addComment.mutate(
+      { incidentId, message },
+      { onSuccess: () => setCommentText('') },
+    );
+  };
 
   return (
     <InternalLayout>
@@ -68,6 +79,11 @@ export function IncidentDetailPage() {
 
                 <KitCard>
                   <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>{SECTION_LABELS.comments}</Typography>
+                  {data.comments.length === 0 && (
+                    <Typography variant="body2" sx={{ color: kit.color.muted, mb: 2 }}>
+                      Комментариев пока нет
+                    </Typography>
+                  )}
                   {data.comments.map((c) => (
                     <Box key={c.id} sx={{ py: 1.5, borderBottom: kit.border.hairline }}>
                       <Typography variant="caption" sx={{ color: kit.color.muted }}>
@@ -82,8 +98,19 @@ export function IncidentDetailPage() {
                     rows={2}
                     placeholder="Добавить комментарий..."
                     size="small"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    disabled={addComment.isPending}
                     sx={{ mt: 2 }}
                   />
+                  <KitButton
+                    variant="primary"
+                    sx={{ mt: 1.5 }}
+                    disabled={!commentText.trim() || addComment.isPending}
+                    onClick={handleAddComment}
+                  >
+                    {addComment.isPending ? 'Отправка…' : 'Добавить комментарий'}
+                  </KitButton>
                 </KitCard>
               </Grid>
 

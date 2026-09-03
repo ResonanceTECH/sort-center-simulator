@@ -2,139 +2,227 @@ import type { AppRole } from '@/types/scm/roles';
 
 export type RouteAccess = 'visible' | 'read' | 'hidden';
 
-/** Routes each role can access. `hidden` = not in sidebar and blocked. */
-export const ROUTE_PERMISSIONS: Record<string, Partial<Record<AppRole, RouteAccess>>> = {
-  '/control-tower': {
-    ADMIN: 'visible',
+type RoleAccess = Partial<Record<AppRole, RouteAccess>>;
+
+const R_ALL_INTERNAL: RoleAccess = {
+  ADMIN: 'read',
+  SUPPLY_CHAIN_MANAGER: 'visible',
+  SUPPLY_PLANNER: 'read',
+  LOGISTICS_MANAGER: 'read',
+  ANALYST: 'read',
+};
+
+/** Route → role matrix (TZ). Missing role = denied. */
+export const ROUTE_PERMISSIONS: Record<string, RoleAccess> = {
+  '/admin': { ADMIN: 'visible' },
+  '/admin/users': { ADMIN: 'visible' },
+  '/admin/roles': { ADMIN: 'visible' },
+  '/admin/organizations': { ADMIN: 'visible' },
+  '/admin/integrations': { ADMIN: 'visible' },
+  '/admin/dictionaries': { ADMIN: 'visible' },
+  '/admin/audit': { ADMIN: 'visible' },
+  '/admin/system': { ADMIN: 'visible' },
+  '/settings': { ADMIN: 'visible', SUPPLY_CHAIN_MANAGER: 'visible' },
+  '/integrations': { ADMIN: 'visible' },
+
+  '/home': {
     SUPPLY_CHAIN_MANAGER: 'visible',
-    SUPPLY_PLANNER: 'visible',
+    SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'visible',
     ANALYST: 'visible',
   },
+  '/control-tower': {
+    ADMIN: 'read',
+    SUPPLY_CHAIN_MANAGER: 'visible',
+    SUPPLY_PLANNER: 'read',
+    LOGISTICS_MANAGER: 'visible',
+    ANALYST: 'read',
+  },
+  '/control-tower/alerts': {
+    SUPPLY_CHAIN_MANAGER: 'visible',
+    SUPPLY_PLANNER: 'read',
+    LOGISTICS_MANAGER: 'visible',
+    ANALYST: 'read',
+  },
+  '/control-tower/insights': {
+    SUPPLY_CHAIN_MANAGER: 'visible',
+    SUPPLY_PLANNER: 'read',
+    LOGISTICS_MANAGER: 'visible',
+    ANALYST: 'read',
+  },
   '/network': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'read',
   },
+  '/facilities': {
+    ADMIN: 'read',
+    SUPPLY_CHAIN_MANAGER: 'visible',
+    SUPPLY_PLANNER: 'read',
+    LOGISTICS_MANAGER: 'read',
+    ANALYST: 'read',
+  },
+  '/lanes': {
+    ADMIN: 'read',
+    SUPPLY_CHAIN_MANAGER: 'visible',
+    SUPPLY_PLANNER: 'read',
+    LOGISTICS_MANAGER: 'visible',
+    ANALYST: 'read',
+  },
   '/suppliers': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'read',
   },
   '/carriers': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
+    SUPPLY_CHAIN_MANAGER: 'visible',
+    SUPPLY_PLANNER: 'read',
+    LOGISTICS_MANAGER: 'visible',
+    ANALYST: 'read',
+  },
+  '/strategy/resilience': {
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'read',
   },
+  '/planning': {
+    ADMIN: 'read',
+    SUPPLY_CHAIN_MANAGER: 'visible',
+    SUPPLY_PLANNER: 'visible',
+    LOGISTICS_MANAGER: 'read',
+    ANALYST: 'read',
+  },
   '/planning/demand': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'visible',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'read',
   },
   '/planning/supply': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'visible',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'read',
   },
   '/planning/inventory': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'visible',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'read',
   },
   '/planning/transport': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'visible',
-    LOGISTICS_MANAGER: 'read',
+    LOGISTICS_MANAGER: 'visible',
     ANALYST: 'read',
   },
   '/planning/plan-fact': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'visible',
     LOGISTICS_MANAGER: 'read',
-    ANALYST: 'read',
+    ANALYST: 'visible',
   },
   '/shipments': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'visible',
     ANALYST: 'read',
   },
   '/map': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'visible',
     ANALYST: 'read',
   },
   '/exceptions': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'visible',
     ANALYST: 'read',
   },
   '/incidents': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'visible',
     ANALYST: 'read',
   },
   '/analytics': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'visible',
   },
   '/scenarios': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
+    SUPPLY_CHAIN_MANAGER: 'visible',
+    SUPPLY_PLANNER: 'visible',
+    LOGISTICS_MANAGER: 'visible',
+    ANALYST: 'visible',
+  },
+  '/scenarios/compare': {
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'visible',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'visible',
   },
   '/recommendations': {
-    ADMIN: 'visible',
-    SUPPLY_CHAIN_MANAGER: 'visible',
-    SUPPLY_PLANNER: 'visible',
-    LOGISTICS_MANAGER: 'read',
-    ANALYST: 'visible',
-  },
-  '/admin/users': { ADMIN: 'visible' },
-  '/admin/roles': { ADMIN: 'visible' },
-  '/settings': {
-    ADMIN: 'visible',
-    SUPPLY_CHAIN_MANAGER: 'visible',
-  },
-  '/integrations': { ADMIN: 'visible' },
-  '/projects': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
     SUPPLY_PLANNER: 'read',
     LOGISTICS_MANAGER: 'read',
     ANALYST: 'read',
   },
   '/reports': {
-    ADMIN: 'visible',
+    ADMIN: 'read',
     SUPPLY_CHAIN_MANAGER: 'visible',
-    ANALYST: 'read',
+    SUPPLY_PLANNER: 'visible',
+    LOGISTICS_MANAGER: 'visible',
+    ANALYST: 'visible',
   },
+  '/projects': R_ALL_INTERNAL,
+
+  '/supplier': { SUPPLIER: 'visible' },
+  '/supplier/dashboard': { SUPPLIER: 'visible' },
+  '/supplier/orders': { SUPPLIER: 'visible' },
+  '/supplier/forecast': { SUPPLIER: 'visible' },
+  '/supplier/shipments': { SUPPLIER: 'visible' },
+  '/supplier/documents': { SUPPLIER: 'visible' },
+  '/supplier/incidents': { SUPPLIER: 'visible' },
+  '/supplier/notifications': { SUPPLIER: 'visible' },
+  '/supplier/performance': { SUPPLIER: 'visible' },
+  '/supplier/settings': { SUPPLIER: 'visible' },
+
+  '/carrier': { CARRIER: 'visible' },
+  '/carrier/dashboard': { CARRIER: 'visible' },
+  '/carrier/shipments': { CARRIER: 'visible' },
+  '/carrier/trips': { CARRIER: 'visible' },
+  '/carrier/completed': { CARRIER: 'visible' },
+  '/carrier/map': { CARRIER: 'visible' },
+  '/carrier/vehicles': { CARRIER: 'visible' },
+  '/carrier/drivers': { CARRIER: 'visible' },
+  '/carrier/documents': { CARRIER: 'visible' },
+  '/carrier/incidents': { CARRIER: 'visible' },
+  '/carrier/notifications': { CARRIER: 'visible' },
+  '/carrier/performance': { CARRIER: 'visible' },
+  '/carrier/settings': { CARRIER: 'visible' },
 };
 
 export function canAccessRoute(role: AppRole | undefined, path: string): boolean {
@@ -144,15 +232,16 @@ export function canAccessRoute(role: AppRole | undefined, path: string): boolean
   const exact = ROUTE_PERMISSIONS[normalized];
   if (exact?.[role]) return exact[role] !== 'hidden';
 
-  const prefix = Object.keys(ROUTE_PERMISSIONS).find(
-    (route) => normalized.startsWith(route) && route !== '/',
-  );
+  const prefix = Object.keys(ROUTE_PERMISSIONS)
+    .sort((a, b) => b.length - a.length)
+    .find((route) => route !== '/' && (normalized === route || normalized.startsWith(`${route}/`)));
+
   if (prefix) {
     const access = ROUTE_PERMISSIONS[prefix]?.[role];
     return access != null && access !== 'hidden';
   }
 
-  return role === 'ADMIN';
+  return false;
 }
 
 export function getRouteAccess(role: AppRole | undefined, path: string): RouteAccess | null {
@@ -163,6 +252,10 @@ export function getRouteAccess(role: AppRole | undefined, path: string): RouteAc
 
   const prefix = Object.keys(ROUTE_PERMISSIONS)
     .sort((a, b) => b.length - a.length)
-    .find((route) => normalized.startsWith(route));
+    .find((route) => normalized === route || normalized.startsWith(`${route}/`));
   return prefix ? (ROUTE_PERMISSIONS[prefix]?.[role] ?? null) : null;
+}
+
+export function isReadOnlyRoute(role: AppRole | undefined, path: string): boolean {
+  return getRouteAccess(role, path) === 'read';
 }

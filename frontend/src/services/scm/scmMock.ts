@@ -8,8 +8,6 @@ import {
   getAnalyticsSection,
   getCarrierDetail,
   getExceptionDetail,
-  getIncidentDetail,
-  getScenarioDetail,
   getShipmentDetail,
   getSupplierDetail,
   INCIDENTS_MOCK,
@@ -17,12 +15,9 @@ import {
   NOTIFICATIONS_MOCK,
   PLAN_FACT_MOCK,
   RECOMMENDATIONS_MOCK,
-  SCENARIOS_MOCK,
   searchEntities,
   SHIPMENTS_MOCK,
   SUPPLIERS_MOCK,
-  SUPPLY_PLAN_MOCK,
-  TRANSPORT_PLAN_MOCK,
 } from '@/mocks/scm/scmData';
 import type { AnalyticsOverviewData, AnalyticsSectionData } from '@/types/scm/analytics';
 import type { CarrierFilters, CarriersPageData } from '@/types/scm/carrier';
@@ -36,9 +31,10 @@ import type {
   SupplyPlanData,
   TransportPlanData,
 } from '@/types/scm/planning';
-import type { RecommendationItem, ScenarioFilters, ScenariosPageData } from '@/types/scm/scenario';
+import type { CreateScenarioInput, RecommendationItem, ScenarioFilters, ScenariosPageData } from '@/types/scm/scenario';
 import type { ShipmentFilters, ShipmentsPageData } from '@/types/scm/shipment';
 import type { SupplierFilters, SuppliersPageData } from '@/types/scm/supplier';
+import { paginateRows, sortRows } from '@/utils/tableSort';
 
 const MOCK_DELAY = 400;
 
@@ -57,6 +53,9 @@ export async function fetchShipmentsMock(filters: ShipmentFilters = {}): Promise
   if (filters.status === 'at-risk') {
     items = items.filter((s) => s.slaRisk.status === 'CRITICAL' || s.slaRisk.status === 'HIGH');
   }
+  if (filters.status === 'in-transit') {
+    items = items.filter((s) => s.status === 'IN_TRANSIT');
+  }
   if (filters.carrier) {
     items = items.filter((s) => s.carrierId === filters.carrier);
   }
@@ -73,11 +72,8 @@ export async function fetchShipmentsMock(filters: ShipmentFilters = {}): Promise
     );
   }
 
-  const total = items.length;
-  const start = page * pageSize;
-  items = items.slice(start, start + pageSize);
-
-  return { items, total, page, pageSize };
+  items = sortRows(items, filters.sortBy, filters.sortDir ?? 'asc');
+  return paginateRows(items, page, pageSize);
 }
 
 export async function fetchShipmentMock(id: string) {
@@ -127,9 +123,8 @@ export async function fetchSuppliersMock(filters: SupplierFilters = {}): Promise
     items = items.filter((s) => s.name.toLowerCase().includes(q));
   }
 
-  const total = items.length;
-  items = items.slice(page * pageSize, page * pageSize + pageSize);
-  return { items, total, page, pageSize };
+  items = sortRows(items, filters.sortBy, filters.sortDir ?? 'asc');
+  return paginateRows(items, page, pageSize);
 }
 
 export async function fetchSupplierMock(id: string) {
@@ -150,9 +145,8 @@ export async function fetchCarriersMock(filters: CarrierFilters = {}): Promise<C
     items = items.filter((c) => c.name.toLowerCase().includes(q));
   }
 
-  const total = items.length;
-  items = items.slice(page * pageSize, page * pageSize + pageSize);
-  return { items, total, page, pageSize };
+  items = sortRows(items, filters.sortBy, filters.sortDir ?? 'asc');
+  return paginateRows(items, page, pageSize);
 }
 
 export async function fetchCarrierMock(id: string) {
@@ -175,16 +169,31 @@ export async function fetchIncidentsMock(filters: IncidentFilters = {}): Promise
     items = items.filter((i) => i.title.toLowerCase().includes(q) || i.id.toLowerCase().includes(q));
   }
 
-  const total = items.length;
-  items = items.slice(page * pageSize, page * pageSize + pageSize);
-  return { items, total, page, pageSize };
+  items = sortRows(items, filters.sortBy, filters.sortDir ?? 'asc');
+  return paginateRows(items, page, pageSize);
 }
 
 export async function fetchIncidentMock(id: string) {
   await delay(MOCK_DELAY);
-  const detail = getIncidentDetail(id);
+  const { getIncidentWithComments } = await import('@/mocks/scm/incidentState');
+  const detail = getIncidentWithComments(id);
   if (!detail) throw new Error('Инцидент не найден');
   return detail;
+}
+
+export async function addIncidentCommentMock(
+  incidentId: string,
+  message: string,
+  author?: { name: string; role: string },
+) {
+  await delay(MOCK_DELAY);
+  const { addIncidentCommentState } = await import('@/mocks/scm/incidentState');
+  return addIncidentCommentState(
+    incidentId,
+    message,
+    author?.name ?? 'Вы',
+    author?.role ?? 'Manager',
+  );
 }
 
 export async function fetchDemandForecastMock(): Promise<DemandForecastData> {
@@ -194,7 +203,8 @@ export async function fetchDemandForecastMock(): Promise<DemandForecastData> {
 
 export async function fetchSupplyPlanMock(): Promise<SupplyPlanData> {
   await delay(MOCK_DELAY);
-  return SUPPLY_PLAN_MOCK;
+  const { getSupplyPlanState } = await import('@/mocks/scm/planState');
+  return getSupplyPlanState();
 }
 
 export async function fetchInventoryPlanMock(): Promise<InventoryPlanData> {
@@ -204,7 +214,8 @@ export async function fetchInventoryPlanMock(): Promise<InventoryPlanData> {
 
 export async function fetchTransportPlanMock(): Promise<TransportPlanData> {
   await delay(MOCK_DELAY);
-  return TRANSPORT_PLAN_MOCK;
+  const { getTransportPlanState } = await import('@/mocks/scm/planState');
+  return getTransportPlanState();
 }
 
 export async function fetchPlanFactMock(): Promise<PlanFactData> {
@@ -214,16 +225,35 @@ export async function fetchPlanFactMock(): Promise<PlanFactData> {
 
 export async function fetchScenariosMock(filters: ScenarioFilters = {}): Promise<ScenariosPageData> {
   await delay(MOCK_DELAY);
-  let items = [...SCENARIOS_MOCK];
+  const { listScenarioState } = await import('@/mocks/scm/scenarioState');
+  let items = listScenarioState();
   if (filters.status) items = items.filter((s) => s.status === filters.status);
   return { items, total: items.length };
 }
 
 export async function fetchScenarioMock(id: string) {
   await delay(MOCK_DELAY);
-  const detail = getScenarioDetail(id);
+  const { getScenarioState } = await import('@/mocks/scm/scenarioState');
+  const detail = getScenarioState(id);
   if (!detail) throw new Error('Сценарий не найден');
   return detail;
+}
+
+export async function createScenarioMock(input: CreateScenarioInput) {
+  await delay(MOCK_DELAY);
+  const { createScenarioState } = await import('@/mocks/scm/scenarioState');
+  return createScenarioState(input);
+}
+
+export async function runScenarioMock(id: string) {
+  const { runScenarioState } = await import('@/mocks/scm/scenarioState');
+  return runScenarioState(id);
+}
+
+export async function compareScenariosMock(ids: string[]) {
+  await delay(MOCK_DELAY);
+  const { compareScenariosState } = await import('@/mocks/scm/scenarioState');
+  return compareScenariosState(ids);
 }
 
 export async function fetchRecommendationsMock(): Promise<RecommendationItem[]> {
@@ -274,4 +304,19 @@ export async function applyRecommendationMock(recommendationId: string) {
 export async function createIncidentFromExceptionMock(exceptionId: string) {
   await delay(MOCK_DELAY);
   return { incidentId: 'inc-new', exceptionId };
+}
+
+export async function fetchLiveMapMock() {
+  await delay(MOCK_DELAY);
+  const { getLiveMapData } = await import('@/mocks/scm/mapData');
+  return getLiveMapData();
+}
+
+export async function executePlanActionMock(
+  planKind: 'supply' | 'transport',
+  action: string,
+) {
+  await delay(MOCK_DELAY);
+  const { applyPlanAction } = await import('@/mocks/scm/planState');
+  return applyPlanAction(planKind, action as import('@/constants/planActions').PlanAction);
 }

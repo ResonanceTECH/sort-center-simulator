@@ -5,58 +5,69 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
 import { FilterBar } from '@/components/tables/FilterBar';
 import { StatusChip } from '@/components/status/StatusChip';
-import { COMMON, labelSeverity } from '@/constants/platformRu';
+import { useDataTableUrlState } from '@/hooks/useDataTableUrlState';
 import { useIncidentsQuery } from '@/hooks/scm/useScmQueries';
-import { useUrlFilters } from '@/hooks/useUrlFilters';
+import { COMMON, labelSeverity } from '@/constants/platformRu';
 import { InternalLayout } from '@/layouts/InternalLayout';
 import { KitCard } from '@/ui-kit/Card';
 import { INCIDENT_STATUS_LABELS } from '@/types/stateMachines';
 import type { IncidentSummary } from '@/types/scm/incident';
 
-const DEFAULT_FILTERS = {
+const FILTER_DEFAULTS = {
   status: undefined as string | undefined,
   severity: undefined as string | undefined,
   search: undefined as string | undefined,
-  page: '0',
-  pageSize: '25',
 };
 
 export function IncidentsPage() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useUrlFilters(DEFAULT_FILTERS);
+  const {
+    filters,
+    setFilterValues,
+    pagination,
+    sorting,
+    sortBy,
+    sortDir,
+    onSortChange,
+    onPageChange,
+    onPageSizeChange,
+  } = useDataTableUrlState(FILTER_DEFAULTS);
 
   const queryFilters = useMemo(
     () => ({
       status: filters.status,
       severity: filters.severity,
       search: filters.search,
-      page: Number(filters.page ?? 0),
-      pageSize: Number(filters.pageSize ?? 25),
+      ...pagination,
+      ...sorting,
     }),
-    [filters],
+    [filters, pagination, sorting],
   );
 
   const { data, isLoading, error, refetch } = useIncidentsQuery(queryFilters);
 
   const columns = useMemo<DataTableColumn<IncidentSummary>[]>(
     () => [
-      { id: 'id', header: 'ID', cell: (row) => row.id },
+      { id: 'id', header: 'ID', sortable: true, cell: (row) => row.id },
       { id: 'title', header: COMMON.title, sortable: true, cell: (row) => row.title },
       {
         id: 'status',
         header: COMMON.status,
+        sortable: true,
         cell: (row) => INCIDENT_STATUS_LABELS[row.status] ?? row.status,
       },
       {
         id: 'severity',
         header: COMMON.severity,
+        sortable: true,
         cell: (row) => <StatusChip status={row.severity} label={row.severity} />,
       },
-      { id: 'owner', header: COMMON.owner, cell: (row) => row.owner },
-      { id: 'shipment', header: 'Поставка', cell: (row) => row.shipmentId ?? '—' },
+      { id: 'owner', header: COMMON.owner, sortable: true, cell: (row) => row.owner },
+      { id: 'shipmentId', header: 'Поставка', cell: (row) => row.shipmentId ?? '—' },
       {
-        id: 'created',
+        id: 'createdAt',
         header: 'Создан',
+        sortable: true,
         cell: (row) => new Date(row.createdAt).toLocaleString('ru-RU'),
       },
     ],
@@ -93,7 +104,7 @@ export function IncidentsPage() {
           { key: 'search', label: COMMON.search, type: 'text' },
         ]}
         values={filters}
-        onChange={(updates) => setFilters({ ...updates, page: '0' })}
+        onChange={setFilterValues}
       />
 
       <EntityStates
@@ -112,8 +123,11 @@ export function IncidentsPage() {
               total={data.total}
               page={data.page}
               pageSize={data.pageSize}
-              onPageChange={(page) => setFilters({ page: String(page) })}
-              onPageSizeChange={(pageSize) => setFilters({ pageSize: String(pageSize), page: '0' })}
+              sortBy={sortBy}
+              sortDir={sortDir}
+              onSortChange={onSortChange}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
               onRowClick={(row) => navigate(`/incidents/${row.id}`)}
               getRowId={(row) => row.id}
             />

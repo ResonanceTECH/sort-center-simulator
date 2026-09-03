@@ -1,5 +1,7 @@
+import type { ExceptionSummary } from '@/types/scm/exception';
+import type { IncidentSummary } from '@/types/scm/incident';
+import type { LiveMapData } from '@/types/scm/map';
 import type { MetricValue } from '@/types/scm/metric';
-import type { SemanticStatus } from '@/types/scm/semantic';
 
 export type ShipmentStatus =
   | 'DRAFT'
@@ -38,11 +40,29 @@ export interface ShipmentTimelineEvent {
   relatedEntityType?: 'exception' | 'incident' | 'shipment';
 }
 
+export interface ShipmentDocument {
+  id: string;
+  name: string;
+  type: string;
+  uploadedAt: string;
+}
+
+export interface ShipmentActivityItem {
+  id: string;
+  timestamp: string;
+  actor: string;
+  action: string;
+  detail?: string;
+}
+
 export interface ShipmentDetail extends ShipmentSummary {
   orderId?: string;
   skus: { sku: string; name: string; quantity: number }[];
-  exceptions: { id: string; type: string; severity: SemanticStatus }[];
-  incidents: { id: string; title: string; status: string }[];
+  exceptions: ExceptionSummary[];
+  incidents: IncidentSummary[];
+  documents: ShipmentDocument[];
+  activity: ShipmentActivityItem[];
+  mapView: LiveMapData;
   timeline: ShipmentTimelineEvent[];
   availableActions: string[];
 }

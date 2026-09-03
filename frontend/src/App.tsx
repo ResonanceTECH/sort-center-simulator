@@ -14,6 +14,7 @@ import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { Projects } from '@/pages/Projects';
 import { Reports } from '@/pages/Reports';
 import { Register } from '@/pages/Register';
+import { RoadmapPage } from '@/pages/RoadmapPage';
 import { UiKitPage } from '@/pages/UiKitPage';
 import { JoinProjectPage } from '@/pages/project/JoinProjectPage';
 import { ProjectMembersPage } from '@/pages/project/ProjectMembersPage';
@@ -67,10 +68,11 @@ export function App() {
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/ui-kit" element={<UiKitPage />} />
+      <Route path="/roadmap" element={<RoadmapPage />} />
       <Route path="/projects/join" element={<JoinProjectPage />} />
 
       <Route element={<ProtectedRoute />}>
-        <Route element={<RoleBasedRoute allowedShells={['internal']} />}>
+        <Route element={<RoleBasedRoute allowedShells={['internal', 'admin']} />}>
           {internalScmRoutes()}
           <Route path="/projects" element={<Projects />} />
           <Route path="/reports" element={<Reports />} />
@@ -101,7 +103,7 @@ export function App() {
         {portalRoutes()}
       </Route>
 
-      <Route path="/dashboard" element={<Navigate to="/control-tower" replace />} />
+      <Route path="/dashboard" element={<Navigate to="/home" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

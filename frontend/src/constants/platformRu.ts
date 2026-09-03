@@ -4,6 +4,7 @@ import type { SemanticStatus } from '@/types/scm/semantic';
 /** Центральный словарь UI платформы (русский) */
 
 export const PLATFORM_BRAND = {
+  admin: 'Консоль администратора',
   internal: 'Платформа цепочки поставок',
   supplier: 'Кабинет поставщика',
   carrier: 'Кабинет перевозчика',
@@ -127,6 +128,17 @@ export const SHIPMENT_ACTION_LABELS: Record<ShipmentAction, string> = {
   CONFIRM_DELIVERY: 'Подтвердить доставку',
 };
 
+export const PLAN_ACTION_LABELS: Record<string, string> = {
+  EDIT: 'Редактировать',
+  CALCULATE: 'Рассчитать',
+  RECALCULATE: 'Пересчитать',
+  SUBMIT: 'Отправить на согласование',
+  APPROVE: 'Утвердить',
+  REJECT: 'Отклонить',
+  ACTIVATE: 'Активировать',
+  CHANGE_CARRIER: 'Сменить перевозчика',
+};
+
 export const TAB_LABELS = {
   overview: 'Обзор',
   performance: 'Показатели',
@@ -211,6 +223,17 @@ export const SECTION_LABELS = {
   quickActions: 'Быстрые действия',
   assignedShipments: 'Назначенные поставки',
   cargoSku: 'Груз / SKU',
+  map: 'Маршрут на карте',
+  exceptions: 'Отклонения',
+  incidents: 'Инциденты',
+  documents: 'Документы',
+  activity: 'Активность',
+  plannedEta: 'Плановый ETA',
+  pickup: 'Забор',
+  partners: 'Участники',
+  noExceptions: 'Нет отклонений по этой поставке',
+  noIncidents: 'Нет инцидентов',
+  noDocuments: 'Документы не загружены',
 } as const;
 
 export const ANALYTICS_SECTION_TITLES: Record<string, string> = {

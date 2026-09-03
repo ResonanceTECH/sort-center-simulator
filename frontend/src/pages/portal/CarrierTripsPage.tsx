@@ -4,27 +4,28 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
 import { StatusChip } from '@/components/status/StatusChip';
 import { COMMON, KPI, SHIPMENT_ACTION_LABELS } from '@/constants/platformRu';
+import { useAuth } from '@/hooks/useAuth';
 import { PortalLayout } from '@/layouts/PortalLayout';
-import { SHIPMENTS_MOCK } from '@/mocks/scm/scmData';
+import { filterShipmentsByOrganization } from '@/mocks/scm/portalData';
 import { KitButton } from '@/ui-kit/Button';
 import { KitCard } from '@/ui-kit/Card';
 import { useUiStore } from '@/store/uiStore';
+import type { ShipmentSummary } from '@/types/scm/shipment';
 
-type TripRow = (typeof SHIPMENTS_MOCK)[0] & { action?: string };
+type TripRow = ShipmentSummary & { action?: string };
 
 export function CarrierTripsPage() {
+  const { user } = useAuth();
   const showSnackbar = useUiStore((s) => s.showSnackbar);
   const [accepted, setAccepted] = useState<Set<string>>(new Set());
 
   const trips = useMemo(
     () =>
-      SHIPMENTS_MOCK.filter((s) => s.carrierName === 'Carrier C')
-        .slice(0, 8)
-        .map((s) => ({
-          ...s,
-          action: accepted.has(s.id) ? 'IN_TRANSIT' : 'AWAITING_ACCEPT',
-        })),
-    [accepted],
+      filterShipmentsByOrganization(user?.organization ?? 'Carrier C', 'carrier', 8).map((s) => ({
+        ...s,
+        action: accepted.has(s.id) ? 'IN_TRANSIT' : 'AWAITING_ACCEPT',
+      })),
+    [accepted, user?.organization],
   );
 
   const columns = useMemo<DataTableColumn<TripRow>[]>(

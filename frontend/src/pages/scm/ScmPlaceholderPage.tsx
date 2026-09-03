@@ -33,5 +33,6 @@ export function ScmPlaceholderPage({
   if (shell === 'carrier') {
     return <PortalLayout shell="carrier">{content}</PortalLayout>;
   }
+  // admin + internal share InternalLayout (shell resolved from role)
   return <InternalLayout>{content}</InternalLayout>;
 }

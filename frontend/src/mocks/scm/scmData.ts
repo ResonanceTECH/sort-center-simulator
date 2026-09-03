@@ -1,3 +1,4 @@
+import { buildShipmentMapView } from '@/mocks/scm/mapData';
 import type { AnalyticsOverviewData, AnalyticsSectionData } from '@/types/scm/analytics';
 import type { CarrierDetail, CarrierSummary } from '@/types/scm/carrier';
 import type { ControlTowerData } from '@/types/scm/controlTower';
@@ -145,6 +146,10 @@ export function getShipmentDetail(id: string): ShipmentDetail | null {
   const summary = SHIPMENTS_MOCK.find((s) => s.id === id);
   if (!summary) return null;
 
+  const routeLabel = `${summary.origin} → ${summary.destination}`;
+  const shipmentExceptions = EXCEPTIONS_MOCK.filter((e) => e.shipmentId === id);
+  const shipmentIncidents = INCIDENTS_MOCK.filter((i) => i.shipmentId === id);
+
   return {
     ...summary,
     orderId: `ORD-${id}`,
@@ -152,8 +157,18 @@ export function getShipmentDetail(id: string): ShipmentDetail | null {
       { sku: 'SKU-4421', name: 'Product Alpha', quantity: 120 },
       { sku: 'SKU-8810', name: 'Product Beta', quantity: 45 },
     ],
-    exceptions: [{ id: 'exc-001', type: 'Длительная остановка ТС', severity: 'CRITICAL' }],
-    incidents: [],
+    exceptions: shipmentExceptions,
+    incidents: shipmentIncidents,
+    documents: [
+      { id: `doc-${id}-1`, name: `Упаковочный лист ${id}.pdf`, type: 'Упаковочный лист', uploadedAt: '2026-09-02' },
+      { id: `doc-${id}-2`, name: `CMR ${id}.pdf`, type: 'CMR', uploadedAt: '2026-09-01' },
+    ],
+    activity: [
+      { id: 'a1', timestamp: '14:32', actor: 'Анна Смирнова', action: 'Перевозчик изменён', detail: 'Carrier A → Carrier B' },
+      { id: 'a2', timestamp: '13:47', actor: 'Система', action: 'Создано отклонение', detail: shipmentExceptions[0]?.type ?? '—' },
+      { id: 'a3', timestamp: '09:14', actor: summary.carrierName, action: 'Забор подтверждён' },
+    ],
+    mapView: buildShipmentMapView(id, routeLabel, summary.slaRisk.status),
     timeline: [
       { id: 't1', timestamp: '08:02', type: 'created', title: 'Поставка создана' },
       { id: 't2', timestamp: '08:35', type: 'accepted', title: 'Перевозчик принял' },
@@ -161,7 +176,16 @@ export function getShipmentDetail(id: string): ShipmentDetail | null {
       { id: 't4', timestamp: '09:26', type: 'transit', title: 'В пути' },
       { id: 't5', timestamp: '13:17', type: 'stop', title: 'Неожиданная остановка' },
       { id: 't6', timestamp: '13:20', type: 'eta', title: 'ETA изменён' },
-      { id: 't7', timestamp: '13:47', type: 'exception', title: 'Создано отклонение', relatedEntityId: 'exc-001', relatedEntityType: 'exception' },
+      ...(shipmentExceptions[0]
+        ? [{
+            id: 't7',
+            timestamp: '13:47',
+            type: 'exception',
+            title: 'Создано отклонение',
+            relatedEntityId: shipmentExceptions[0].id,
+            relatedEntityType: 'exception' as const,
+          }]
+        : []),
     ],
     availableActions: getBackendActionsForStatus(summary.status),
   };
@@ -434,7 +458,7 @@ export const TRANSPORT_PLAN_MOCK: TransportPlanData = {
       risk: { label: 'Риск', value: 'CRITICAL', status: 'CRITICAL' },
     },
   ],
-  availableActions: ['CHANGE_CARRIER', 'RECALCULATE', 'SUBMIT'],
+  availableActions: ['EDIT', 'CALCULATE', 'SUBMIT', 'RECALCULATE', 'CHANGE_CARRIER'],
 };
 
 export const PLAN_FACT_MOCK: PlanFactData = {
