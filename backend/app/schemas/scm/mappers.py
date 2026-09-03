@@ -11,6 +11,7 @@ from app.models.exception_models import Incident, ScmException
 from app.models.master_data import Carrier, NetworkNode, Product, Supplier
 from app.models.shipment import Shipment, ShipmentEvent, ShipmentItem
 from app.schemas.scm.common import MetricOut, ShipmentDetailOut, ShipmentSummaryOut
+from app.security.shipment_actions import filter_available_actions
 
 
 def _node_name(db: Session, node_id: UUID | None) -> str:
@@ -46,7 +47,12 @@ def shipment_to_summary(db: Session, s: Shipment) -> ShipmentSummaryOut:
     )
 
 
-def shipment_to_detail(db: Session, s: Shipment) -> ShipmentDetailOut:
+def shipment_to_detail(
+    db: Session,
+    s: Shipment,
+    *,
+    permissions: set[str] | None = None,
+) -> ShipmentDetailOut:
     summary = shipment_to_summary(db, s)
     items = db.query(ShipmentItem).filter(ShipmentItem.shipment_id == s.id).all()
     skus = []
@@ -80,6 +86,11 @@ def shipment_to_detail(db: Session, s: Shipment) -> ShipmentDetailOut:
     ]
 
     ref = s.external_ref or str(s.id)[:8].upper()
+    actions = (
+        filter_available_actions(s.status, permissions)
+        if permissions is not None
+        else available_actions(ShipmentStatus(s.status))
+    )
     return ShipmentDetailOut(
         **summary.model_dump(by_alias=True),
         orderId=f"ORD-{ref}",
@@ -87,5 +98,5 @@ def shipment_to_detail(db: Session, s: Shipment) -> ShipmentDetailOut:
         exceptions=exc_out,
         incidents=inc_out,
         timeline=timeline,
-        availableActions=available_actions(ShipmentStatus(s.status)),
+        availableActions=actions,
     )

@@ -57,7 +57,7 @@ class UserService:
             "email": user.email,
             "team": user.team,
             "organization_id": str(self.organization_id),
-            "roles": [r.value for r in roles],
+            "roles": roles,
         }
 
     def create_user(

@@ -10,12 +10,12 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.enums import AppRole
+from app.core.enums import AppRole, WorkspaceType
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.organization import Organization
-from app.models.rbac import RefreshSession, Role, UserOrganization, UserRole
+from app.models.rbac import Permission, RefreshSession, Role, RolePermission, UserOrganization, UserRole
 from app.models.user import User
-from app.security.permissions import ROLE_PERMISSIONS, user_has_permission
+from app.schemas.auth import MeResponse, MeUserOut, OrganizationOut
 
 
 def get_user_by_email(db: Session, email: str) -> Optional[User]:
@@ -112,13 +112,56 @@ def revoke_refresh_token(db: Session, refresh_token: str) -> None:
         db.commit()
 
 
-def get_user_roles(db: Session, user_id: UUID, organization_id: UUID) -> list[AppRole]:
+def get_user_roles(db: Session, user_id: UUID, organization_id: UUID) -> list[str]:
+    """Return role codes for user in org (system + custom)."""
     rows = db.scalars(
         select(Role)
         .join(UserRole, UserRole.role_id == Role.id)
         .where(UserRole.user_id == user_id, UserRole.organization_id == organization_id)
+        .order_by(Role.code)
     ).all()
-    return [AppRole(r.code) for r in rows]
+    return [r.code for r in rows]
+
+
+def get_user_permissions(db: Session, user_id: UUID, organization_id: UUID) -> set[str]:
+    """Load effective permissions from DB role_permissions (not hardcoded matrices)."""
+    rows = db.scalars(
+        select(Permission.code)
+        .join(RolePermission, RolePermission.permission_id == Permission.id)
+        .join(Role, Role.id == RolePermission.role_id)
+        .join(UserRole, UserRole.role_id == Role.id)
+        .where(UserRole.user_id == user_id, UserRole.organization_id == organization_id)
+    ).all()
+    return set(rows)
+
+
+def resolve_workspaces(role_codes: list[str]) -> list[str]:
+    """Map assigned roles → product workspaces (4 shells)."""
+    workspaces: set[str] = set()
+    for code in role_codes:
+        if code == AppRole.ADMIN.value:
+            workspaces.add(WorkspaceType.ADMIN.value)
+        elif code == AppRole.SUPPLIER.value:
+            workspaces.add(WorkspaceType.SUPPLIER.value)
+        elif code == AppRole.CARRIER.value:
+            workspaces.add(WorkspaceType.CARRIER.value)
+        elif code in {
+            AppRole.SUPPLY_CHAIN_MANAGER.value,
+            AppRole.SUPPLY_PLANNER.value,
+            AppRole.LOGISTICS_MANAGER.value,
+            AppRole.ANALYST.value,
+        }:
+            workspaces.add(WorkspaceType.INTERNAL.value)
+        else:
+            # Custom org roles default to INTERNAL unless named otherwise later
+            workspaces.add(WorkspaceType.INTERNAL.value)
+    order = [
+        WorkspaceType.ADMIN.value,
+        WorkspaceType.INTERNAL.value,
+        WorkspaceType.SUPPLIER.value,
+        WorkspaceType.CARRIER.value,
+    ]
+    return [w for w in order if w in workspaces]
 
 
 def get_primary_organization_id(db: Session, user_id: UUID) -> UUID | None:
@@ -132,20 +175,56 @@ def get_primary_organization_id(db: Session, user_id: UUID) -> UUID | None:
     return link.organization_id if link else None
 
 
+def get_primary_organization(db: Session, user_id: UUID) -> Organization | None:
+    org_id = get_primary_organization_id(db, user_id)
+    if org_id is None:
+        return None
+    return db.get(Organization, org_id)
+
+
 def user_to_dict(db: Session, user: User) -> dict:
-    org_id = get_primary_organization_id(db, user.id)
+    org = get_primary_organization(db, user.id)
     roles: list[str] = []
-    if org_id:
-        roles = [r.value for r in get_user_roles(db, user.id, org_id)]
+    if org:
+        roles = get_user_roles(db, user.id, org.id)
     return {
         "id": str(user.id),
         "name": user.name,
         "email": user.email,
         "team": user.team,
-        "organization_id": str(org_id) if org_id else None,
+        "organization_id": str(org.id) if org else None,
         "roles": roles,
         "role": roles[0] if roles else None,
     }
+
+
+def build_me_response(db: Session, user: User) -> MeResponse:
+    org = get_primary_organization(db, user.id)
+    roles: list[str] = []
+    permissions: list[str] = []
+    workspaces: list[str] = []
+    org_out: OrganizationOut | None = None
+
+    if org:
+        roles = get_user_roles(db, user.id, org.id)
+        permissions = sorted(get_user_permissions(db, user.id, org.id))
+        workspaces = resolve_workspaces(roles)
+        org_out = OrganizationOut(id=str(org.id), name=org.name, type=org.type)
+
+    return MeResponse(
+        user=MeUserOut(id=str(user.id), name=user.name, email=user.email, team=user.team),
+        organization=org_out,
+        organization_type=org.type if org else None,
+        roles=roles,
+        permissions=permissions,
+        available_workspaces=workspaces,
+        id=str(user.id),
+        name=user.name,
+        email=user.email,
+        team=user.team,
+        organization_id=str(org.id) if org else None,
+        role=roles[0] if roles else None,
+    )
 
 
 def issue_auth_token(user: User) -> str:
@@ -153,5 +232,4 @@ def issue_auth_token(user: User) -> str:
 
 
 def check_permission(db: Session, user_id: UUID, org_id: UUID, permission: str) -> bool:
-    roles = get_user_roles(db, user_id, org_id)
-    return user_has_permission(roles, permission)
+    return permission in get_user_permissions(db, user_id, org_id)

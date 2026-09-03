@@ -1,8 +1,7 @@
 """SCM platform permission catalog and default role matrices.
 
-Source of truth for seed (DB role_permissions) and runtime AuthContext (until
-Stage 4 loads permissions from DB). Authorization is permission-based;
-AppRole is a bag of permissions, not a hard-coded switch.
+ROLE_PERMISSIONS is the seed source of truth. Runtime AuthContext loads
+permissions from DB role_permissions (see get_user_permissions).
 """
 
 from __future__ import annotations

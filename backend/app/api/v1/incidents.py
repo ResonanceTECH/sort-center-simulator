@@ -32,7 +32,7 @@ class CommentIn(BaseModel):
 
 def _serialize_comment(db: Session, comment: IncidentComment, ctx: AuthContext | None = None) -> dict:
     user = db.get(User, comment.author_id)
-    role = ctx.roles[0].value if ctx and ctx.roles else "—"
+    role = ctx.roles[0] if ctx and ctx.roles else "—"
     return {
         "id": str(comment.id),
         "message": comment.message,
