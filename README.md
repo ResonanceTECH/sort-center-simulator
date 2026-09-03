@@ -104,9 +104,15 @@ UI: [http://localhost:3000](http://localhost:3000)
 # backend
 cd backend && SKIP_DB_STARTUP=1 PYTHONPATH=. pytest tests/ -q
 
-# frontend
+# frontend (all)
 cd frontend && npm test
+
+# frontend SCM smoke only
+cd frontend && npm run test:scm
 ```
+
+SCM acceptance checklist: [docs/scm-acceptance-checklist.md](./docs/scm-acceptance-checklist.md)  
+Page map (дерево экранов): [docs/scm-page-map.md](./docs/scm-page-map.md)
 
 
 

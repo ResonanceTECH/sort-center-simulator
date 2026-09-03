@@ -3,7 +3,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
 import { useAuth } from '@/hooks/useAuth';
 import { PortalLayout } from '@/layouts/PortalLayout';
-import { SHIPMENTS_MOCK } from '@/mocks/scm/scmData';
+import { filterShipmentsByOrganization } from '@/mocks/scm/portalData';
 import { KitCard } from '@/ui-kit/Card';
 import { KitButton } from '@/ui-kit/Button';
 import { useUiStore } from '@/store/uiStore';
@@ -83,7 +83,11 @@ export function SupplierOrdersPage() {
 }
 
 export function SupplierShipmentsPage() {
-  const supplierItems = SHIPMENTS_MOCK.filter((s) => s.supplierName === 'Supplier B').slice(0, 10);
+  const { user } = useAuth();
+  const supplierItems = useMemo(
+    () => filterShipmentsByOrganization(user?.organization ?? 'Supplier B', 'supplier', 10),
+    [user?.organization],
+  );
 
   const columns = useMemo<DataTableColumn<(typeof supplierItems)[0]>[]>(
     () => [

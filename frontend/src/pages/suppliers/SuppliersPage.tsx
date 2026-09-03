@@ -5,25 +5,33 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
 import { FilterBar } from '@/components/tables/FilterBar';
 import { StatusChip } from '@/components/status/StatusChip';
-import { COMMON, KPI } from '@/constants/platformRu';
+import { useDataTableUrlState } from '@/hooks/useDataTableUrlState';
 import { useSuppliersQuery } from '@/hooks/scm/useScmQueries';
-import { useUrlFilters } from '@/hooks/useUrlFilters';
+import { COMMON, KPI } from '@/constants/platformRu';
 import { InternalLayout } from '@/layouts/InternalLayout';
 import { KitCard } from '@/ui-kit/Card';
 import type { SupplierSummary } from '@/types/scm/supplier';
 
-const DEFAULT_FILTERS = {
+const FILTER_DEFAULTS = {
   status: undefined as string | undefined,
   risk: undefined as string | undefined,
   region: undefined as string | undefined,
   search: undefined as string | undefined,
-  page: '0',
-  pageSize: '25',
 };
 
 export function SuppliersPage() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useUrlFilters(DEFAULT_FILTERS);
+  const {
+    filters,
+    setFilterValues,
+    pagination,
+    sorting,
+    sortBy,
+    sortDir,
+    onSortChange,
+    onPageChange,
+    onPageSizeChange,
+  } = useDataTableUrlState(FILTER_DEFAULTS);
 
   const queryFilters = useMemo(
     () => ({
@@ -31,10 +39,10 @@ export function SuppliersPage() {
       risk: filters.risk,
       region: filters.region,
       search: filters.search,
-      page: Number(filters.page ?? 0),
-      pageSize: Number(filters.pageSize ?? 25),
+      ...pagination,
+      ...sorting,
     }),
-    [filters],
+    [filters, pagination, sorting],
   );
 
   const { data, isLoading, error, refetch } = useSuppliersQuery(queryFilters);
@@ -50,6 +58,7 @@ export function SuppliersPage() {
       {
         id: 'otif',
         header: KPI.otif,
+        sortable: true,
         cell: (row) => (
           <StatusChip status={row.otif.status} label={`${row.otif.value}${row.otif.unit ?? ''}`} />
         ),
@@ -57,24 +66,28 @@ export function SuppliersPage() {
       {
         id: 'reliability',
         header: KPI.reliability,
+        sortable: true,
         cell: (row) => `${row.reliability.value}${row.reliability.unit ?? ''}`,
       },
       {
-        id: 'leadTime',
+        id: 'leadTimeDays',
         header: KPI.leadTime,
+        sortable: true,
         cell: (row) => `${row.leadTimeDays.value}${row.leadTimeDays.unit ?? ''}`,
       },
       {
         id: 'supplyShare',
         header: KPI.supplyShare,
+        sortable: true,
         cell: (row) => `${row.supplyShare.value}${row.supplyShare.unit ?? ''}`,
       },
       {
         id: 'risk',
         header: COMMON.risk,
+        sortable: true,
         cell: (row) => <StatusChip status={row.risk.status} label={String(row.risk.value)} />,
       },
-      { id: 'incidents', header: KPI.openIncidents, cell: (row) => row.openIncidents },
+      { id: 'openIncidents', header: KPI.openIncidents, sortable: true, cell: (row) => row.openIncidents },
     ],
     [],
   );
@@ -107,7 +120,7 @@ export function SuppliersPage() {
           { key: 'search', label: COMMON.search, type: 'text' },
         ]}
         values={filters}
-        onChange={(updates) => setFilters({ ...updates, page: '0' })}
+        onChange={setFilterValues}
       />
 
       <EntityStates
@@ -126,8 +139,11 @@ export function SuppliersPage() {
               total={data.total}
               page={data.page}
               pageSize={data.pageSize}
-              onPageChange={(page) => setFilters({ page: String(page) })}
-              onPageSizeChange={(pageSize) => setFilters({ pageSize: String(pageSize), page: '0' })}
+              sortBy={sortBy}
+              sortDir={sortDir}
+              onSortChange={onSortChange}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
               onRowClick={(row) => navigate(`/suppliers/${row.id}`)}
               getRowId={(row) => row.id}
             />

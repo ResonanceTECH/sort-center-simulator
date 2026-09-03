@@ -25,6 +25,7 @@ export const FOOTER_CONTENT = {
       links: [
         { label: 'Документация API', href: 'http://localhost:8000/docs' },
         { label: 'UI Kit', href: '/ui-kit' },
+        { label: 'Roadmap', href: '/roadmap' },
         { label: 'Демо-доступ', href: '/register' },
         { label: 'GitHub', href: '#' },
         { label: 'SupplyTwin', href: '#hero' },

@@ -18,6 +18,7 @@ import {
   fetchRecommendations,
   fetchScenario,
   fetchScenarios,
+  compareScenarios,
   fetchShipment,
   fetchShipments,
   fetchSupplier,
@@ -102,6 +103,15 @@ export function useScenariosQuery(filters: ScenarioFilters = {}) {
 
 export function useScenarioQuery(id: string) {
   return useQuery({ queryKey: queryKeys.scenario(id), queryFn: () => fetchScenario(id), enabled: Boolean(id) });
+}
+
+export function useScenarioCompareQuery(scenarioIds: string[]) {
+  const sortedIds = [...scenarioIds].sort();
+  return useQuery({
+    queryKey: queryKeys.scenarioCompare(sortedIds),
+    queryFn: () => compareScenarios(sortedIds),
+    enabled: sortedIds.length >= 2,
+  });
 }
 
 export function useRecommendationsQuery() {

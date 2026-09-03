@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     api_port: int = 8000
     cors_origins: str = "http://localhost:3000"
     secret_key: str = "dev-secret-change-me"
+    redis_url: str = "redis://localhost:6379/0"
+    celery_broker_url: str = "redis://localhost:6379/0"
 
     @property
     def cors_origins_list(self) -> list[str]:

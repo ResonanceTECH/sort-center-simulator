@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:scm": "vitest run src/services/scm src/constants/businessActions.test.ts src/constants/planActions.test.ts src/constants/scmRoutes.test.ts src/constants/roleWorkspaces.test.ts",
     "test:watch": "vitest"
   },
   "dependencies": {

@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { RouteLoader } from '@/components/shared/RouteLoader';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -11,6 +11,7 @@ interface RoleBasedRouteProps {
 }
 
 export function RoleBasedRoute({ allowedShells, requiredPath }: RoleBasedRouteProps) {
+  const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
   const { role, canAccessRoute } = usePermissions();
 
@@ -28,7 +29,8 @@ export function RoleBasedRoute({ allowedShells, requiredPath }: RoleBasedRoutePr
     return <Navigate to={getDefaultRoute(role)} replace />;
   }
 
-  if (requiredPath && !canAccessRoute(requiredPath)) {
+  const pathToCheck = requiredPath ?? location.pathname;
+  if (!canAccessRoute(pathToCheck)) {
     return <Navigate to={getDefaultRoute(role)} replace />;
   }
 

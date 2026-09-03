@@ -35,7 +35,9 @@ export interface UserApiResponse {
   email: string;
   team?: string;
   role?: AppRole;
+  roles?: AppRole[];
   organization?: string;
+  organization_id?: string;
 }
 
 export interface AuthApiResponse {

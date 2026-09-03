@@ -1,4 +1,5 @@
 import type { ShipmentStatus } from '@/types/scm/shipment';
+import type { SemanticStatus } from '@/types/scm/semantic';
 
 export type PlanStatus =
   | 'DRAFT'
@@ -50,4 +51,22 @@ export const SCENARIO_STATUS_LABELS: Record<ScenarioStatus, string> = {
   COMPLETED: 'Завершён',
   FAILED: 'Ошибка',
   CANCELLED: 'Отменён',
+};
+
+export const PLAN_STATUS_LABELS: Record<PlanStatus, string> = {
+  DRAFT: 'Черновик',
+  CALCULATED: 'Рассчитан',
+  REVIEW: 'На согласовании',
+  APPROVED: 'Утверждён',
+  ACTIVE: 'Активен',
+  SUPERSEDED: 'Заменён',
+};
+
+export const PLAN_STATUS_SEMANTIC: Record<PlanStatus, SemanticStatus> = {
+  DRAFT: 'INFO',
+  CALCULATED: 'NORMAL',
+  REVIEW: 'WARNING',
+  APPROVED: 'SUCCESS',
+  ACTIVE: 'SUCCESS',
+  SUPERSEDED: 'NO_DATA',
 };

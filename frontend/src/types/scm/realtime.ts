@@ -5,14 +5,22 @@ export type RealtimeEventType =
   | 'INCIDENT_UPDATE'
   | 'NOTIFICATION'
   | 'SCENARIO_PROGRESS'
-  | 'COMMENT';
+  | 'COMMENT'
+  | 'MAP_POSITION_UPDATE';
+
+export interface RealtimeMapPayload {
+  markerId: string;
+  lng: number;
+  lat: number;
+}
 
 export interface RealtimeEvent {
   id: string;
   type: RealtimeEventType;
-  entityType: 'shipment' | 'exception' | 'incident' | 'scenario' | 'notification';
+  entityType: 'shipment' | 'exception' | 'incident' | 'scenario' | 'notification' | 'vehicle';
   entityId: string;
   message: string;
   link?: string;
   timestamp: string;
+  mapPayload?: RealtimeMapPayload;
 }

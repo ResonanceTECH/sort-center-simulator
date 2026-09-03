@@ -1,6 +1,8 @@
-import type { RealtimeEvent } from '@/types/scm/realtime';
+import { createMapPositionUpdate } from '@/mocks/scm/mapData';
+import type { RealtimeEvent, RealtimeMapPayload } from '@/types/scm/realtime';
 
 type Listener = (event: RealtimeEvent) => void;
+type MapListener = (payload: RealtimeMapPayload) => void;
 
 const EVENT_TEMPLATES: Omit<RealtimeEvent, 'id' | 'timestamp'>[] = [
   {
@@ -47,19 +49,34 @@ const EVENT_TEMPLATES: Omit<RealtimeEvent, 'id' | 'timestamp'>[] = [
   },
 ];
 
-let timer: ReturnType<typeof setInterval> | null = null;
+let sseTimer: ReturnType<typeof setInterval> | null = null;
+let mapTimer: ReturnType<typeof setInterval> | null = null;
 let index = 0;
 const listeners = new Set<Listener>();
+const mapListeners = new Set<MapListener>();
 
 function emit(event: RealtimeEvent) {
   listeners.forEach((fn) => fn(event));
 }
 
+function emitMapPosition(payload: RealtimeMapPayload) {
+  mapListeners.forEach((fn) => fn(payload));
+  emit({
+    id: `rt-map-${Date.now()}`,
+    type: 'MAP_POSITION_UPDATE',
+    entityType: 'vehicle',
+    entityId: payload.markerId,
+    message: `Обновление позиции: ${payload.markerId}`,
+    timestamp: new Date().toISOString(),
+    mapPayload: payload,
+  });
+}
+
 export function subscribeRealtimeEvents(listener: Listener): () => void {
   listeners.add(listener);
 
-  if (!timer) {
-    timer = setInterval(() => {
+  if (!sseTimer) {
+    sseTimer = setInterval(() => {
       const template = EVENT_TEMPLATES[index % EVENT_TEMPLATES.length]!;
       index += 1;
       emit({
@@ -72,9 +89,29 @@ export function subscribeRealtimeEvents(listener: Listener): () => void {
 
   return () => {
     listeners.delete(listener);
-    if (listeners.size === 0 && timer) {
-      clearInterval(timer);
-      timer = null;
+    if (listeners.size === 0 && sseTimer) {
+      clearInterval(sseTimer);
+      sseTimer = null;
+    }
+  };
+}
+
+/** High-frequency marker ticks for live map (mock GPS pings). */
+export function subscribeMapPositionUpdates(listener: MapListener): () => void {
+  mapListeners.add(listener);
+
+  if (!mapTimer) {
+    mapTimer = setInterval(() => {
+      const payload = createMapPositionUpdate();
+      if (payload) emitMapPosition(payload);
+    }, 4_000);
+  }
+
+  return () => {
+    mapListeners.delete(listener);
+    if (mapListeners.size === 0 && mapTimer) {
+      clearInterval(mapTimer);
+      mapTimer = null;
     }
   };
 }

@@ -51,6 +51,8 @@ export interface IncidentFilters {
   search?: string;
   page?: number;
   pageSize?: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
 }
 
 export interface IncidentsPageData {

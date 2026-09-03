@@ -74,6 +74,11 @@ function parseErrorBody(
     return { message: data.message.trim(), fieldErrors: data.errors };
   }
 
+  const nested = data as { error?: { message?: string; code?: string } };
+  if (typeof nested.error?.message === 'string' && nested.error.message.trim()) {
+    return { message: nested.error.message.trim() };
+  }
+
   if (typeof data.detail === 'string' && data.detail.trim()) {
     return { message: data.detail.trim() };
   }

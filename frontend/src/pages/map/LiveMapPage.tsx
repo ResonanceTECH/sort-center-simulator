@@ -1,19 +1,29 @@
 import { useMemo, useState } from 'react';
 import { Box, Chip, Drawer, Grid, Typography } from '@mui/material';
+import { EntityStates } from '@/components/common/EntityStates';
 import { PageHeader } from '@/components/common/PageHeader';
 import { LiveMapPanel, LAYER_LABELS } from '@/components/maps/LiveMapPanel';
 import { StatusChip } from '@/components/status/StatusChip';
-import { NAV_LABELS } from '@/constants/platformRu';
+import { labelSemantic, NAV_LABELS } from '@/constants/platformRu';
+import { useLiveMapData } from '@/hooks/scm/useLiveMapData';
 import { InternalLayout } from '@/layouts/InternalLayout';
-import { LIVE_MAP_MOCK } from '@/mocks/scm/mapData';
-import type { MapLayerType, MapMarker } from '@/types/scm/map';
+import type { MapGeofence, MapLayerType, MapMarker } from '@/types/scm/map';
 import { kit } from '@/ui-kit/tokens';
 
 const LAYER_KEYS = Object.keys(LAYER_LABELS) as MapLayerType[];
 
 export function LiveMapPage() {
-  const [activeLayers, setActiveLayers] = useState<MapLayerType[]>(['shipments', 'routes', 'vehicles']);
-  const [selected, setSelected] = useState<MapMarker | null>(null);
+  const { data, isLoading, error, refetch, dataUpdatedAt } = useLiveMapData();
+  const [activeLayers, setActiveLayers] = useState<MapLayerType[]>([
+    'shipments',
+    'routes',
+    'vehicles',
+    'riskZones',
+    'warehouses',
+    'hubs',
+  ]);
+  const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
+  const [selectedGeofence, setSelectedGeofence] = useState<MapGeofence | null>(null);
 
   const toggleLayer = (layer: MapLayerType) => {
     setActiveLayers((prev) =>
@@ -21,14 +31,32 @@ export function LiveMapPage() {
     );
   };
 
-  const drawerData = useMemo(() => {
-    if (!selected) return null;
-    return LIVE_MAP_MOCK.markers.find((m) => m.id === selected.id) ?? selected;
-  }, [selected]);
+  const drawerMarker = useMemo(() => {
+    if (!selectedMarker || !data) return selectedMarker;
+    return data.markers.find((m) => m.id === selectedMarker.id) ?? selectedMarker;
+  }, [selectedMarker, data]);
+
+  const lastUpdate = dataUpdatedAt
+    ? new Date(dataUpdatedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    : null;
 
   return (
     <InternalLayout>
-      <PageHeader title={NAV_LABELS.liveMap} subtitle="MapLibre — транспорт, поставки, маршруты, зоны риска" />
+      <PageHeader
+        title={NAV_LABELS.liveMap}
+        subtitle="MapLibre — кластеризация, geofence-полигоны, live GPS (mock SSE)"
+        actions={
+          lastUpdate ? (
+            <Chip
+              size="small"
+              label={`Live · ${lastUpdate}`}
+              color="success"
+              variant="outlined"
+              sx={{ borderRadius: kit.radius.button }}
+            />
+          ) : undefined
+        }
+      />
 
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
         {LAYER_KEYS.map((layer) => (
@@ -43,21 +71,66 @@ export function LiveMapPage() {
         ))}
       </Box>
 
-      <LiveMapPanel
-        data={LIVE_MAP_MOCK}
-        activeLayers={activeLayers}
-        onMarkerSelect={setSelected}
-      />
+      <EntityStates loading={isLoading} error={error?.message} onRetry={() => void refetch()}>
+        {data && (
+          <LiveMapPanel
+            data={data}
+            activeLayers={activeLayers}
+            clustering
+            onMarkerSelect={(marker) => {
+              setSelectedGeofence(null);
+              setSelectedMarker(marker);
+            }}
+            onGeofenceSelect={(geofence) => {
+              setSelectedMarker(null);
+              setSelectedGeofence(geofence);
+            }}
+          />
+        )}
+      </EntityStates>
 
-      <Drawer anchor="right" open={Boolean(selected)} onClose={() => setSelected(null)}>
-        {drawerData && (
+      <Drawer
+        anchor="right"
+        open={Boolean(drawerMarker || selectedGeofence)}
+        onClose={() => {
+          setSelectedMarker(null);
+          setSelectedGeofence(null);
+        }}
+      >
+        {drawerMarker && (
           <Box sx={{ width: 320, p: 3 }}>
-            <Typography variant="h6" fontWeight={700}>{drawerData.label}</Typography>
-            <StatusChip status={drawerData.status} label={LAYER_LABELS[drawerData.type]} />
+            <Typography variant="h6" fontWeight={700}>{drawerMarker.label}</Typography>
+            <StatusChip status={drawerMarker.status} label={LAYER_LABELS[drawerMarker.type]} />
             <Grid container spacing={1} sx={{ mt: 2 }}>
-              <Grid item xs={6}><Typography variant="caption">Lat</Typography><Typography variant="body2">{drawerData.lat.toFixed(2)}</Typography></Grid>
-              <Grid item xs={6}><Typography variant="caption">Lng</Typography><Typography variant="body2">{drawerData.lng.toFixed(2)}</Typography></Grid>
+              <Grid item xs={6}>
+                <Typography variant="caption">Lat</Typography>
+                <Typography variant="body2">{drawerMarker.lat.toFixed(4)}</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="caption">Lng</Typography>
+                <Typography variant="body2">{drawerMarker.lng.toFixed(4)}</Typography>
+              </Grid>
             </Grid>
+            {drawerMarker.link && (
+              <Typography
+                component="a"
+                href={drawerMarker.link}
+                variant="body2"
+                sx={{ display: 'inline-block', mt: 2, color: kit.color.ember }}
+              >
+                Открыть поставку →
+              </Typography>
+            )}
+          </Box>
+        )}
+
+        {selectedGeofence && (
+          <Box sx={{ width: 320, p: 3 }}>
+            <Typography variant="h6" fontWeight={700}>{selectedGeofence.label}</Typography>
+            <StatusChip status={selectedGeofence.status} label={labelSemantic(selectedGeofence.status)} />
+            <Typography variant="body2" sx={{ mt: 2, color: kit.color.muted }}>
+              Geofence-полигон · зона риска на маршруте
+            </Typography>
           </Box>
         )}
       </Drawer>

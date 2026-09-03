@@ -16,9 +16,7 @@ import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   APP_BRAND,
-  CARRIER_NAV_ITEMS,
-  INTERNAL_NAV_GROUPS,
-  SUPPLIER_NAV_ITEMS,
+  getNavGroupsForRole,
   type NavGroupConfig,
   type NavItemConfig,
 } from '@/constants/navigation';
@@ -51,14 +49,8 @@ function LogoMark() {
   );
 }
 
-function filterNavItem(item: NavItemConfig, role: ReturnType<typeof usePermissions>['role']): boolean {
-  if (item.roles && role && !item.roles.includes(role)) return false;
-  return canAccessRoute(role, item.path);
-}
-
 function filterNavGroup(group: NavGroupConfig, role: ReturnType<typeof usePermissions>['role']): NavGroupConfig | null {
-  if (group.roles && role && !group.roles.some((r) => r === role)) return null;
-  const items = group.items.filter((item) => filterNavItem(item, role));
+  const items = group.items.filter((item) => canAccessRoute(role, item.path));
   if (items.length === 0) return null;
   return { ...group, items };
 }
@@ -76,23 +68,34 @@ function SidebarContent({ shell, onNavigate }: SidebarContentProps) {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   const groups = useMemo(() => {
-    if (shell === 'supplier') return null;
-    if (shell === 'carrier') return null;
-    return INTERNAL_NAV_GROUPS.map((g) => filterNavGroup(g, role)).filter(Boolean) as NavGroupConfig[];
-  }, [shell, role]);
-
-  const flatItems = shell === 'supplier' ? SUPPLIER_NAV_ITEMS : shell === 'carrier' ? CARRIER_NAV_ITEMS : null;
+    return getNavGroupsForRole(role)
+      .map((g) => filterNavGroup(g, role))
+      .filter(Boolean) as NavGroupConfig[];
+  }, [role]);
 
   const handleNav = (path: string) => {
     navigate(path);
     onNavigate?.();
   };
 
-  const isActive = (path: string) =>
-    location.pathname === path || location.pathname.startsWith(`${path}/`);
+  const isActive = (path: string) => {
+    if (location.pathname === path) return true;
+    const exactOnly = new Set([
+      '/home',
+      '/planning',
+      '/admin',
+      '/supplier',
+      '/supplier/dashboard',
+      '/carrier',
+      '/carrier/dashboard',
+      '/control-tower',
+    ]);
+    if (exactOnly.has(path)) return location.pathname === path;
+    return location.pathname.startsWith(`${path}/`);
+  };
 
   const getBadge = (key?: NavItemConfig['badgeKey']) => {
-    if (!key || !towerData) return 0;
+    if (!key || !towerData || shell === 'supplier' || shell === 'carrier' || shell === 'admin') return 0;
     return key === 'exceptions' ? towerData.alertCounts.exceptions : towerData.alertCounts.incidents;
   };
 
@@ -151,9 +154,7 @@ function SidebarContent({ shell, onNavigate }: SidebarContentProps) {
       </Box>
 
       <List sx={{ flex: 1, px: 1.5, py: 0 }}>
-        {flatItems?.map(renderItem)}
-
-        {groups?.map((group) => {
+        {groups.map((group) => {
           const open = collapsed[group.id] ?? true;
           const hasActive = group.items.some((item) => isActive(item.path));
 

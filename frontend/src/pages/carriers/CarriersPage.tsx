@@ -5,30 +5,38 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
 import { FilterBar } from '@/components/tables/FilterBar';
 import { StatusChip } from '@/components/status/StatusChip';
-import { COMMON, KPI, TAB_LABELS } from '@/constants/platformRu';
+import { useDataTableUrlState } from '@/hooks/useDataTableUrlState';
 import { useCarriersQuery } from '@/hooks/scm/useScmQueries';
-import { useUrlFilters } from '@/hooks/useUrlFilters';
+import { COMMON, KPI, TAB_LABELS } from '@/constants/platformRu';
 import { InternalLayout } from '@/layouts/InternalLayout';
 import { KitCard } from '@/ui-kit/Card';
 import type { CarrierSummary } from '@/types/scm/carrier';
 
-const DEFAULT_FILTERS = {
+const FILTER_DEFAULTS = {
   search: undefined as string | undefined,
-  page: '0',
-  pageSize: '25',
 };
 
 export function CarriersPage() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useUrlFilters(DEFAULT_FILTERS);
+  const {
+    filters,
+    setFilterValues,
+    pagination,
+    sorting,
+    sortBy,
+    sortDir,
+    onSortChange,
+    onPageChange,
+    onPageSizeChange,
+  } = useDataTableUrlState(FILTER_DEFAULTS);
 
   const queryFilters = useMemo(
     () => ({
       search: filters.search,
-      page: Number(filters.page ?? 0),
-      pageSize: Number(filters.pageSize ?? 25),
+      ...pagination,
+      ...sorting,
     }),
-    [filters],
+    [filters.search, pagination, sorting],
   );
 
   const { data, isLoading, error, refetch } = useCarriersQuery(queryFilters);
@@ -39,28 +47,33 @@ export function CarriersPage() {
       {
         id: 'otif',
         header: KPI.otif,
+        sortable: true,
         cell: (row) => <StatusChip status={row.otif.status} label={`${row.otif.value}${row.otif.unit ?? ''}`} />,
       },
       {
         id: 'etaAccuracy',
         header: KPI.etaAccuracy,
+        sortable: true,
         cell: (row) => `${row.etaAccuracy.value}${row.etaAccuracy.unit ?? ''}`,
       },
       {
         id: 'averageDelay',
         header: KPI.averageDelay,
+        sortable: true,
         cell: (row) => `${row.averageDelay.value}${row.averageDelay.unit ?? ''}`,
       },
-      { id: 'routes', header: TAB_LABELS.routes, cell: (row) => row.routesCount },
-      { id: 'shipments', header: 'Поставок', cell: (row) => row.shipmentCount },
+      { id: 'routesCount', header: TAB_LABELS.routes, sortable: true, cell: (row) => row.routesCount },
+      { id: 'shipmentCount', header: 'Поставок', sortable: true, cell: (row) => row.shipmentCount },
       {
         id: 'incidentRate',
         header: KPI.incidentRate,
+        sortable: true,
         cell: (row) => `${row.incidentRate.value}${row.incidentRate.unit ?? ''}`,
       },
       {
         id: 'risk',
         header: COMMON.risk,
+        sortable: true,
         cell: (row) => <StatusChip status={row.risk.status} label={String(row.risk.value)} />,
       },
     ],
@@ -74,7 +87,7 @@ export function CarriersPage() {
       <FilterBar
         fields={[{ key: 'search', label: COMMON.search, type: 'text' }]}
         values={filters}
-        onChange={(updates) => setFilters({ ...updates, page: '0' })}
+        onChange={setFilterValues}
       />
 
       <EntityStates
@@ -92,8 +105,11 @@ export function CarriersPage() {
               total={data.total}
               page={data.page}
               pageSize={data.pageSize}
-              onPageChange={(page) => setFilters({ page: String(page) })}
-              onPageSizeChange={(pageSize) => setFilters({ pageSize: String(pageSize), page: '0' })}
+              sortBy={sortBy}
+              sortDir={sortDir}
+              onSortChange={onSortChange}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
               onRowClick={(row) => navigate(`/carriers/${row.id}`)}
               getRowId={(row) => row.id}
             />

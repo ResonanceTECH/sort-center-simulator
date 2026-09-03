@@ -46,3 +46,21 @@ export interface ScenariosPageData {
   items: ScenarioSummary[];
   total: number;
 }
+
+export interface CreateScenarioInput {
+  name: string;
+  parameters: ScenarioParameter[];
+}
+
+export interface ScenarioComparisonRow {
+  kpi: string;
+  baseline: string;
+  values: Record<string, string>;
+  semantic?: Record<string, ComparisonSemantic>;
+}
+
+export interface ScenarioComparisonData {
+  scenarios: Array<{ id: string; name: string }>;
+  rows: ScenarioComparisonRow[];
+  bestScenarioId?: string;
+}

@@ -34,13 +34,14 @@ export function mapAuthToken(dto: { access_token?: string; token?: string }): st
 }
 
 export function mapUser(dto: UserApiResponse): User {
+  const role = dto.role ?? dto.roles?.[0] ?? 'SUPPLY_CHAIN_MANAGER';
   return {
     id: dto.id,
     name: dto.name,
     email: dto.email,
     team: dto.team,
-    role: dto.role ?? 'SUPPLY_CHAIN_MANAGER',
-    organization: dto.organization,
+    role,
+    organization: dto.organization ?? dto.organization_id,
   };
 }
 

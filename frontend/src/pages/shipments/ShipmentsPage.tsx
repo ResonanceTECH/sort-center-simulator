@@ -5,26 +5,34 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
 import { FilterBar } from '@/components/tables/FilterBar';
 import { StatusChip } from '@/components/status/StatusChip';
+import { useDataTableUrlState } from '@/hooks/useDataTableUrlState';
 import { useShipmentsQuery } from '@/hooks/scm/useScmQueries';
-import { useUrlFilters } from '@/hooks/useUrlFilters';
 import { COMMON, KPI } from '@/constants/platformRu';
 import { InternalLayout } from '@/layouts/InternalLayout';
 import { SHIPMENT_STATUS_LABELS } from '@/types/stateMachines';
 import type { ShipmentSummary } from '@/types/scm/shipment';
 
-const DEFAULT_FILTERS = {
+const FILTER_DEFAULTS = {
   status: undefined as string | undefined,
   risk: undefined as string | undefined,
   supplier: undefined as string | undefined,
   carrier: undefined as string | undefined,
   search: undefined as string | undefined,
-  page: '0',
-  pageSize: '25',
 };
 
 export function ShipmentsPage() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useUrlFilters(DEFAULT_FILTERS);
+  const {
+    filters,
+    setFilterValues,
+    pagination,
+    sorting,
+    sortBy,
+    sortDir,
+    onSortChange,
+    onPageChange,
+    onPageSizeChange,
+  } = useDataTableUrlState(FILTER_DEFAULTS);
 
   const queryFilters = useMemo(
     () => ({
@@ -33,10 +41,10 @@ export function ShipmentsPage() {
       supplier: filters.supplier,
       carrier: filters.carrier,
       search: filters.search,
-      page: Number(filters.page ?? 0),
-      pageSize: Number(filters.pageSize ?? 25),
+      ...pagination,
+      ...sorting,
     }),
-    [filters],
+    [filters, pagination, sorting],
   );
 
   const { data, isLoading, error, refetch } = useShipmentsQuery(queryFilters);
@@ -56,6 +64,7 @@ export function ShipmentsPage() {
       {
         id: 'forecastEta',
         header: KPI.forecastEta,
+        sortable: true,
         cell: (row) => new Date(row.forecastEta).toLocaleString('ru-RU'),
       },
       {
@@ -67,6 +76,7 @@ export function ShipmentsPage() {
       {
         id: 'slaRisk',
         header: KPI.slaRisk,
+        sortable: true,
         cell: (row) => (
           <StatusChip
             status={row.slaRisk.status}
@@ -80,7 +90,10 @@ export function ShipmentsPage() {
 
   return (
     <InternalLayout>
-      <PageHeader title="Поставки" subtitle="Операционный список — фильтры синхронизированы с URL" />
+      <PageHeader
+        title="Поставки"
+        subtitle="Сортировка и фильтры синхронизированы с URL (?sortBy=&sortDir=)"
+      />
 
       <FilterBar
         fields={[
@@ -106,7 +119,7 @@ export function ShipmentsPage() {
           { key: 'search', label: 'Поиск', type: 'text' },
         ]}
         values={filters}
-        onChange={(updates) => setFilters({ ...updates, page: '0' })}
+        onChange={setFilterValues}
       />
 
       <EntityStates
@@ -124,8 +137,11 @@ export function ShipmentsPage() {
             total={data.total}
             page={data.page}
             pageSize={data.pageSize}
-            onPageChange={(page) => setFilters({ page: String(page) })}
-            onPageSizeChange={(pageSize) => setFilters({ pageSize: String(pageSize), page: '0' })}
+            sortBy={sortBy}
+            sortDir={sortDir}
+            onSortChange={onSortChange}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
             onRowClick={(row) => navigate(`/shipments/${row.id}`)}
             getRowId={(row) => row.id}
             virtualized

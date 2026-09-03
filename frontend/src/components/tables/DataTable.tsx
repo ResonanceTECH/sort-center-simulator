@@ -70,7 +70,8 @@ export function DataTable<T>({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activeSortBy = sortBy ?? internalSort?.id;
-  const activeSortDir = sortBy ? sortDir : (internalSort?.dir ?? 'asc');
+  const activeSortDir = sortBy !== undefined ? sortDir : (internalSort?.dir ?? 'asc');
+  const isControlledSort = Boolean(onSortChange);
 
   const handleSort = (columnId: string) => {
     const nextDir =
@@ -81,6 +82,9 @@ export function DataTable<T>({
       setInternalSort({ id: columnId, dir: nextDir });
     }
   };
+
+  const showSortActive = (columnId: string) =>
+    isControlledSort ? sortBy === columnId : activeSortBy === columnId;
 
   const virtualizer = useVirtualizer({
     count: data.length,
@@ -123,8 +127,8 @@ export function DataTable<T>({
                 <TableCell key={column.id} sx={{ fontWeight: 700, bgcolor: LANDING.paper }}>
                   {column.sortable ? (
                     <TableSortLabel
-                      active={activeSortBy === column.id}
-                      direction={activeSortBy === column.id ? activeSortDir : 'asc'}
+                      active={showSortActive(column.id)}
+                      direction={showSortActive(column.id) ? activeSortDir : 'asc'}
                       onClick={() => handleSort(column.id)}
                     >
                       {column.header}

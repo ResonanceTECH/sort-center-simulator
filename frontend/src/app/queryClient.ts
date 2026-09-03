@@ -32,9 +32,11 @@ export const queryKeys = {
   planFact: ['planFact'] as const,
   scenarios: (filters?: object) => ['scenarios', filters] as const,
   scenario: (id: string) => ['scenario', id] as const,
+  scenarioCompare: (ids: string[]) => ['scenarioCompare', ids] as const,
   recommendations: ['recommendations'] as const,
   analyticsOverview: ['analyticsOverview'] as const,
   analyticsSection: (section: string) => ['analyticsSection', section] as const,
   globalSearch: (query: string) => ['globalSearch', query] as const,
   notifications: ['notifications'] as const,
+  liveMap: ['liveMap'] as const,
 };

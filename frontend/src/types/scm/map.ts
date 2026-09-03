@@ -20,7 +20,17 @@ export interface MapRoute {
   status: SemanticStatus;
 }
 
+/** Geofence / risk zone polygon (closed ring). */
+export interface MapGeofence {
+  id: string;
+  label: string;
+  status: SemanticStatus;
+  /** GeoJSON polygon ring — first point equals last. */
+  coordinates: [number, number][];
+}
+
 export interface LiveMapData {
   markers: MapMarker[];
   routes: MapRoute[];
+  geofences: MapGeofence[];
 }
