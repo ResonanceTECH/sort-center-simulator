@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ActivityTimeline } from '@/components/common/ActivityTimeline';
 import { EntityStates } from '@/components/common/EntityStates';
 import { PageHeader } from '@/components/common/PageHeader';
+import { ContextualDocsLink } from '@/docs/components/ContextualDocsLink';
 import { LiveMapPanel } from '@/components/maps/LiveMapPanel';
 import { ExceptionCard } from '@/components/scenarios/ExceptionCard';
 import { KpiCard } from '@/components/status/KpiCard';
@@ -29,6 +30,7 @@ export function ControlTowerPage() {
       <PageHeader
         title={NAV_LABELS.controlTower}
         subtitle="Что в цепочке требует вашего внимания сейчас?"
+        actions={<ContextualDocsLink slug="getting-started/overview" />}
       />
 
       <EntityStates loading={isLoading} error={error?.message} onRetry={() => void refetch()}>

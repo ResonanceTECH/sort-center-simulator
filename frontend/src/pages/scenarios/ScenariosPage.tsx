@@ -2,6 +2,7 @@ import { Box, Grid, LinearProgress, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { EntityStates } from '@/components/common/EntityStates';
 import { PageHeader } from '@/components/common/PageHeader';
+import { ContextualDocsLink } from '@/docs/components/ContextualDocsLink';
 import { StatusChip } from '@/components/status/StatusChip';
 import { COMMON } from '@/constants/platformRu';
 import { useScenariosQuery } from '@/hooks/scm/useScmQueries';
@@ -22,6 +23,7 @@ export function ScenariosPage() {
         subtitle="What-if анализ и сравнение сценариев"
         actions={
           <>
+            <ContextualDocsLink slug="scenarios/overview" />
             <KitButton variant="ghost" onClick={() => navigate('/scenarios/compare')}>
               {COMMON.compare}
             </KitButton>

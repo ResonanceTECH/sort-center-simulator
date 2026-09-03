@@ -1,6 +1,7 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/common/PageHeader';
+import { ContextualDocsLink } from '@/docs/components/ContextualDocsLink';
 import { KpiCard } from '@/components/status/KpiCard';
 import { StatusChip } from '@/components/status/StatusChip';
 import {
@@ -79,6 +80,7 @@ export function PlanningOverviewPage() {
       <PageHeader
         title="Планирование"
         subtitle={`Цикл ${demand.data?.period ?? '—'} · версия прогноза ${demand.data?.version ?? '—'}`}
+        actions={<ContextualDocsLink slug="planning/overview" />}
       />
 
       <Grid container spacing={2} sx={{ mb: 3 }}>

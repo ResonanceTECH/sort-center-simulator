@@ -15,6 +15,7 @@ import type { BoardGroupBy, ShipmentsView } from '@/components/shipments/boardCo
 import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
 import { StatusChip } from '@/components/status/StatusChip';
 import { ActionGuard } from '@/components/common/ActionGuard';
+import { ContextualDocsLink } from '@/docs/components/ContextualDocsLink';
 import { useDataTableUrlState } from '@/hooks/useDataTableUrlState';
 import { useLiveMapData } from '@/hooks/scm/useLiveMapData';
 import { useShipmentBoardRealtime } from '@/hooks/scm/useShipmentBoardRealtime';
@@ -147,6 +148,7 @@ export function ShipmentsPage() {
         subtitle="Мониторинг и управление текущими поставками"
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+            <ContextualDocsLink slug="execution/shipments" />
             <ActionGuard permission="shipment.create">
               <KitButton variant="primary" onClick={() => navigate('/shipments/new')}>
                 Создать поставку

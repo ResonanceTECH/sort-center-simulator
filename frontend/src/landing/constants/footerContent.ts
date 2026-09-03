@@ -23,12 +23,12 @@ export const FOOTER_CONTENT = {
     {
       title: 'Ресурсы',
       links: [
-        { label: 'Документация API', href: 'http://localhost:8000/docs' },
+        { label: 'Документация', href: '/docs' },
+        { label: 'API (OpenAPI)', href: 'http://localhost:8000/docs' },
+        { label: 'Changelog', href: '/changelog' },
         { label: 'UI Kit', href: '/ui-kit' },
         { label: 'Roadmap', href: '/roadmap' },
-        { label: 'Демо-доступ', href: '/register' },
-        { label: 'GitHub', href: '#' },
-        { label: 'SupplyTwin', href: '#hero' },
+        { label: 'Войти в демо', href: '/login' },
       ],
     },
   ],

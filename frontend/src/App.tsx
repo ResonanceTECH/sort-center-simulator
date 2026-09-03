@@ -33,11 +33,18 @@ import {
 } from '@/pages/project/ProjectSectionPages';
 import { internalScmRoutes, portalRoutes } from '@/routes/scmRoutes';
 import { ForbiddenPage } from '@/pages/ForbiddenPage';
+import { ChangelogPage } from '@/pages/ChangelogPage';
 import { resolveLandingPath } from '@/workspace/workspaceResolver';
 import { WorkspaceResolver } from '@/components/common/WorkspaceResolver';
 
 const LandingPage = lazy(() =>
   import('@/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
+);
+const DocsHomePage = lazy(() =>
+  import('@/docs/pages/DocsHomePage').then((m) => ({ default: m.DocsHomePage })),
+);
+const DocsArticlePage = lazy(() =>
+  import('@/docs/pages/DocsArticlePage').then((m) => ({ default: m.DocsArticlePage })),
 );
 
 function GuestRoute({ children }: { children: ReactNode }) {
@@ -73,6 +80,24 @@ export function App() {
       <Route path="/roadmap" element={<RoadmapPage />} />
       <Route path="/projects/join" element={<JoinProjectPage />} />
 
+      <Route
+        path="/docs"
+        element={
+          <Suspense fallback={<RouteLoader />}>
+            <DocsHomePage />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/docs/*"
+        element={
+          <Suspense fallback={<RouteLoader />}>
+            <DocsArticlePage />
+          </Suspense>
+        }
+      />
+      <Route path="/changelog" element={<ChangelogPage />} />
+
       <Route element={<ProtectedRoute />}>
         <Route element={<RoleBasedRoute allowedShells={['internal', 'admin']} />}>
           {internalScmRoutes()}
@@ -80,7 +105,6 @@ export function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/general" element={<General />} />
           <Route path="/templates" element={<PlaceholderPage title="Шаблоны" />} />
-          <Route path="/docs" element={<PlaceholderPage title="Документация" />} />
 
           <Route path="/projects/:projectId" element={<ProjectLayout />}>
             <Route index element={<ProjectOverviewPage />} />
