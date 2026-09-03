@@ -12,8 +12,8 @@ cd frontend && npm test
 # Только SCM
 cd frontend && npm run test:scm
 
-# Backend SCM API
-cd backend && SKIP_DB_STARTUP=1 PYTHONPATH=. pytest tests/api/test_scm_api.py -q
+# Backend SCM API + security
+cd backend && SKIP_DB_STARTUP=1 PYTHONPATH=. pytest tests/api/test_scm_api.py tests/security -q
 ```
 
 | Набор | Файлы | Что проверяет |
@@ -35,13 +35,15 @@ cd backend && SKIP_DB_STARTUP=1 PYTHONPATH=. pytest tests/api/test_scm_api.py -q
 
 | Email | Роль | Shell |
 |-------|------|-------|
-| `demo@sortcenter.ru` | Supply Chain Manager | internal |
-| `planner@scm.ru` | Supply Planner | internal |
-| `logistics@scm.ru` | Logistics Manager | internal |
-| `analyst@scm.ru` | Analyst | internal |
-| `admin@scm.ru` | Admin | internal |
-| `supplier@scm.ru` | Supplier | portal |
-| `carrier@scm.ru` | Carrier | portal |
+| `manager@demo.scm.ru` | Supply Chain Manager | internal |
+| `planner@demo.scm.ru` | Supply Planner | internal |
+| `logistics@demo.scm.ru` / `demo@sortcenter.ru` | Logistics Manager | internal |
+| `analyst@demo.scm.ru` | Analyst | internal |
+| `admin@demo.scm.ru` (`admin@sortcenter.ru` / `admin123`) | Admin | admin |
+| `supplier@demo.scm.ru` | Supplier (Alpha) | portal |
+| `carrier@demo.scm.ru` | Carrier (Vector) | portal |
+
+Пароль по умолчанию: `demo123` (кроме `admin@sortcenter.ru` → `admin123`).
 
 ---
 
