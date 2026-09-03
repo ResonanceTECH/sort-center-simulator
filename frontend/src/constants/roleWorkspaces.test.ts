@@ -28,10 +28,10 @@ describe('role workspaces (TZ screens & access)', () => {
 
   it('uses JTBD landing pages per role', () => {
     expect(getDefaultRoute('ADMIN')).toBe('/admin');
-    expect(getDefaultRoute('SUPPLY_CHAIN_MANAGER')).toBe('/home');
+    expect(getDefaultRoute('SUPPLY_CHAIN_MANAGER')).toBe('/control-tower');
     expect(getDefaultRoute('SUPPLY_PLANNER')).toBe('/planning');
-    expect(getDefaultRoute('LOGISTICS_MANAGER')).toBe('/home');
-    expect(getDefaultRoute('ANALYST')).toBe('/home');
+    expect(getDefaultRoute('LOGISTICS_MANAGER')).toBe('/shipments?view=board');
+    expect(getDefaultRoute('ANALYST')).toBe('/analytics');
     expect(getDefaultRoute('SUPPLIER')).toBe('/supplier/dashboard');
     expect(getDefaultRoute('CARRIER')).toBe('/carrier/dashboard');
   });
@@ -80,9 +80,11 @@ describe('role workspaces (TZ screens & access)', () => {
 
   it('gives logistics an ops sidebar without demand forecast', () => {
     const paths = collectPaths('LOGISTICS_MANAGER');
-    expect(paths).toContain('/shipments');
-    expect(paths).toContain('/map');
+    expect(paths).toContain('/shipments?view=board');
+    expect(paths).toContain('/shipments?view=table');
+    expect(paths).toContain('/shipments?view=map');
     expect(paths).toContain('/lanes');
     expect(paths).not.toContain('/planning/demand');
   });
 });
+

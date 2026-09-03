@@ -93,6 +93,18 @@ const AdminUsersPage = lazy(() =>
 const AdminRolesPage = lazy(() =>
   import('@/pages/admin/AdminRolesPage').then((m) => ({ default: m.AdminRolesPage })),
 );
+const AdminDashboardPage = lazy(() =>
+  import('@/pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })),
+);
+const AdminOrganizationsPage = lazy(() =>
+  import('@/pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminOrganizationsPage })),
+);
+const AdminIntegrationsPage = lazy(() =>
+  import('@/pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminIntegrationsPage })),
+);
+const AdminAuditPage = lazy(() =>
+  import('@/pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminAuditPage })),
+);
 const ScmPlaceholderPage = lazy(() =>
   import('@/pages/scm/ScmPlaceholderPage').then((m) => ({ default: m.ScmPlaceholderPage })),
 );
@@ -107,6 +119,9 @@ const SupplierOrdersPage = lazy(() =>
 );
 const SupplierShipmentsPage = lazy(() =>
   import('@/pages/portal/SupplierPortalPages').then((m) => ({ default: m.SupplierShipmentsPage })),
+);
+const CarrierShipmentsPage = lazy(() =>
+  import('@/pages/portal/SupplierPortalPages').then((m) => ({ default: m.CarrierShipmentsPage })),
 );
 const CarrierTripsPage = lazy(() =>
   import('@/pages/portal/CarrierTripsPage').then((m) => ({ default: m.CarrierTripsPage })),
@@ -151,9 +166,9 @@ export function internalScmRoutes() {
       <Route path="/network" element={<Lazy><NetworkPage /></Lazy>} />
       <Route path="/network/edit" element={<Lazy><ScmPlaceholderPage title="Редактор сети" /></Lazy>} />
       <Route path="/network/nodes/:nodeId" element={<Lazy><ScmPlaceholderPage title="Узел сети" /></Lazy>} />
-      <Route path="/facilities" element={<Lazy><ScmPlaceholderPage title="Склады / РЦ / хабы" /></Lazy>} />
+      <Route path="/facilities" element={<Lazy><NetworkPage /></Lazy>} />
       <Route path="/facilities/:facilityId" element={<Lazy><ScmPlaceholderPage title="Объект" /></Lazy>} />
-      <Route path="/lanes" element={<Lazy><ScmPlaceholderPage title="Транспортные направления" /></Lazy>} />
+      <Route path="/lanes" element={<Lazy><TransportPlanPage /></Lazy>} />
       <Route path="/lanes/:laneId" element={<Lazy><ScmPlaceholderPage title="Направление" /></Lazy>} />
 
       <Route path="/suppliers" element={<Lazy><SuppliersPage /></Lazy>} />
@@ -194,14 +209,14 @@ export function internalScmRoutes() {
 
       <Route path="/admin/users" element={<Lazy><AdminUsersPage /></Lazy>} />
       <Route path="/admin/roles" element={<Lazy><AdminRolesPage /></Lazy>} />
-      <Route path="/admin" element={<Lazy><ScmPlaceholderPage title="Администрирование" subtitle="Обзор системы, доступов и интеграций" /></Lazy>} />
-      <Route path="/admin/organizations" element={<Lazy><ScmPlaceholderPage title="Организации" /></Lazy>} />
-      <Route path="/admin/integrations" element={<Lazy><ScmPlaceholderPage title="Интеграции" /></Lazy>} />
+      <Route path="/admin" element={<Lazy><AdminDashboardPage /></Lazy>} />
+      <Route path="/admin/organizations" element={<Lazy><AdminOrganizationsPage /></Lazy>} />
+      <Route path="/admin/integrations" element={<Lazy><AdminIntegrationsPage /></Lazy>} />
       <Route path="/admin/dictionaries" element={<Lazy><ScmPlaceholderPage title="Справочники" /></Lazy>} />
-      <Route path="/admin/audit" element={<Lazy><ScmPlaceholderPage title="Audit Log" /></Lazy>} />
+      <Route path="/admin/audit" element={<Lazy><AdminAuditPage /></Lazy>} />
       <Route path="/admin/system" element={<Lazy><ScmPlaceholderPage title="System Health" subtitle="Jobs, failed jobs, health" /></Lazy>} />
       <Route path="/settings" element={<Lazy><SettingsPage /></Lazy>} />
-      <Route path="/integrations" element={<Lazy><ScmPlaceholderPage title="Интеграции" /></Lazy>} />
+      <Route path="/integrations" element={<Lazy><AdminIntegrationsPage /></Lazy>} />
       <Route path="/strategy/resilience" element={<Lazy><ScmPlaceholderPage title="Устойчивость" subtitle="Resilience / риск-контур сети поставок" /></Lazy>} />
     </>
   );
@@ -220,23 +235,23 @@ export function portalRoutes() {
         <Route path="/supplier/incidents" element={<Lazy><PortalIncidentsPage shell="supplier" /></Lazy>} />
         <Route path="/supplier/notifications" element={<Lazy><ScmPlaceholderPage title="Уведомления" shell="supplier" /></Lazy>} />
         <Route path="/supplier/performance" element={<Lazy><PortalPerformancePage shell="supplier" /></Lazy>} />
-        <Route path="/supplier/settings" element={<Lazy><ScmPlaceholderPage title="Профиль организации" shell="supplier" /></Lazy>} />
+        <Route path="/supplier/settings" element={<Lazy><SettingsPage shell="supplier" /></Lazy>} />
       </Route>
 
       <Route element={<RoleBasedRoute allowedShells={['carrier']} />}>
         <Route path="/carrier" element={<Lazy><CarrierDashboardPage /></Lazy>} />
         <Route path="/carrier/dashboard" element={<Lazy><CarrierDashboardPage /></Lazy>} />
-        <Route path="/carrier/shipments" element={<Lazy><CarrierDashboardPage /></Lazy>} />
+        <Route path="/carrier/shipments" element={<Lazy><CarrierShipmentsPage /></Lazy>} />
         <Route path="/carrier/trips" element={<Lazy><CarrierTripsPage /></Lazy>} />
-        <Route path="/carrier/completed" element={<Lazy><ScmPlaceholderPage title="Завершённые рейсы" shell="carrier" /></Lazy>} />
+        <Route path="/carrier/completed" element={<Lazy><CarrierShipmentsPage /></Lazy>} />
         <Route path="/carrier/vehicles" element={<Lazy><CarrierVehiclesPage /></Lazy>} />
-        <Route path="/carrier/drivers" element={<Lazy><ScmPlaceholderPage title="Водители" shell="carrier" /></Lazy>} />
+        <Route path="/carrier/drivers" element={<Lazy><CarrierVehiclesPage /></Lazy>} />
         <Route path="/carrier/map" element={<Lazy><CarrierMapPage /></Lazy>} />
         <Route path="/carrier/incidents" element={<Lazy><PortalIncidentsPage shell="carrier" /></Lazy>} />
         <Route path="/carrier/documents" element={<Lazy><PortalDocumentsPage shell="carrier" /></Lazy>} />
         <Route path="/carrier/notifications" element={<Lazy><ScmPlaceholderPage title="Уведомления" shell="carrier" /></Lazy>} />
         <Route path="/carrier/performance" element={<Lazy><PortalPerformancePage shell="carrier" /></Lazy>} />
-        <Route path="/carrier/settings" element={<Lazy><ScmPlaceholderPage title="Профиль" shell="carrier" /></Lazy>} />
+        <Route path="/carrier/settings" element={<Lazy><SettingsPage shell="carrier" /></Lazy>} />
       </Route>
     </>
   );

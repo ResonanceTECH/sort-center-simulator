@@ -15,6 +15,7 @@ import type { RecommendationItem, ScenarioDetail, ScenarioSummary } from '@/type
 import type { ShipmentDetail, ShipmentSummary, ShipmentStatus } from '@/types/scm/shipment';
 import type { ScmNotification, SearchResult } from '@/types/scm/search';
 import type { SupplierDetail, SupplierSummary } from '@/types/scm/supplier';
+import type { SemanticStatus } from '@/types/scm/semantic';
 import { KPI } from '@/constants/platformRu';
 
 export const CONTROL_TOWER_MOCK: ControlTowerData = {
@@ -82,18 +83,62 @@ export const EXCEPTIONS_MOCK: ExceptionSummary[] = [
   },
 ];
 
+/** Board lifecycle columns (risk is a badge, not a column). */
+const BOARD_STATUSES: ShipmentStatus[] = [
+  'PLANNED',
+  'ASSIGNED',
+  'ACCEPTED',
+  'READY_FOR_PICKUP',
+  'IN_TRANSIT',
+  'ARRIVED',
+  'DELIVERED',
+];
+
+const RISK_CYCLE: Array<'NORMAL' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | 'NO_DATA'> = [
+  'NORMAL',
+  'MEDIUM',
+  'HIGH',
+  'CRITICAL',
+  'NO_DATA',
+];
+
+const PROGRESS_BY_STATUS: Record<string, number> = {
+  PLANNED: 0.12,
+  ASSIGNED: 0.28,
+  ACCEPTED: 0.4,
+  READY_FOR_PICKUP: 0.52,
+  IN_TRANSIT: 0.72,
+  ARRIVED: 0.88,
+  DELIVERED: 1,
+};
+
+function riskToSemantic(risk: (typeof RISK_CYCLE)[number]): SemanticStatus {
+  if (risk === 'MEDIUM') return 'WARNING';
+  if (risk === 'HIGH') return 'HIGH';
+  if (risk === 'CRITICAL') return 'CRITICAL';
+  if (risk === 'NO_DATA') return 'NO_DATA';
+  return 'NORMAL';
+}
+
 function generateShipments(): ShipmentSummary[] {
-  const suppliers = ['Supplier A', 'Supplier B', 'Supplier C'];
-  const carriers = ['Carrier A', 'Carrier B', 'Carrier C'];
+  const suppliers = ['Supplier Alpha', 'Supplier B', 'Supplier C'];
+  const carriers = ['Carrier Vector', 'Carrier B', 'Carrier C'];
+  const warehouses = ['Москва РЦ', 'СПб', 'Казань'];
   const routes = [
     { origin: 'Казань', destination: 'Москва' },
     { origin: 'Москва', destination: 'СПб' },
     { origin: 'Supplier B', destination: 'Warehouse Moscow' },
   ];
+  const now = Date.now();
 
   return Array.from({ length: 5000 }, (_, i) => {
     const route = routes[i % routes.length]!;
-    const atRisk = i < 120;
+    const status = BOARD_STATUSES[i % BOARD_STATUSES.length]!;
+    const riskRaw = RISK_CYCLE[i % RISK_CYCLE.length]!;
+    const riskStatus = riskToSemantic(riskRaw);
+    const atRisk = riskStatus === 'HIGH' || riskStatus === 'CRITICAL';
+    const noTracking = riskRaw === 'NO_DATA' || i % 17 === 0;
+    const deviation = atRisk ? 138 + (i % 40) : i % 9 === 0 ? 35 : 8;
     return {
       id: `SH-${String(100 + i).padStart(4, '0')}`,
       supplierId: `sup-${i % 3}`,
@@ -102,17 +147,25 @@ function generateShipments(): ShipmentSummary[] {
       carrierName: carriers[i % 3]!,
       origin: route.origin,
       destination: route.destination,
-      status: atRisk ? 'IN_TRANSIT' : 'IN_TRANSIT',
+      status,
       pickupAt: '2026-09-02T08:00:00Z',
       plannedEta: '2026-09-02T14:00:00Z',
-      forecastEta: atRisk ? '2026-09-02T17:25:00Z' : '2026-09-02T14:10:00Z',
-      deviationMinutes: atRisk ? 205 : 10,
+      forecastEta: atRisk ? '2026-09-02T16:18:00Z' : '2026-09-02T14:10:00Z',
+      deviationMinutes: deviation,
       slaRisk: {
         label: KPI.slaRisk,
-        value: atRisk ? 92 : 12,
+        value: atRisk ? 92 : riskStatus === 'WARNING' ? 48 : 12,
         unit: '%',
-        status: atRisk ? 'CRITICAL' : 'NORMAL',
+        status: riskStatus === 'WARNING' ? 'WARNING' : riskStatus,
       },
+      riskStatus,
+      vehiclePlate: status === 'PLANNED' ? undefined : `А${100 + (i % 900)}BC 77`,
+      lastTrackingAt: noTracking ? undefined : new Date(now - (i % 12) * 60_000).toISOString(),
+      trackingStatus: noTracking ? 'NO_DATA' : i % 11 === 0 ? 'STALE' : 'OK',
+      progress: PROGRESS_BY_STATUS[status] ?? 0.1,
+      warehouse: warehouses[i % warehouses.length],
+      routeLabel: `${route.origin} → ${route.destination}`,
+      availableActions: getBackendActionsForStatus(status),
     };
   });
 }

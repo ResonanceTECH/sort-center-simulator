@@ -1,4 +1,6 @@
 import { DEMO_USERS } from '@/mocks/authData';
+import { getRolePermissions } from '@/constants/scmPermissions';
+import { getAppShell } from '@/types/scm/roles';
 import { delay } from '@/utils/error';
 import type {
   AuthResponse,
@@ -6,6 +8,7 @@ import type {
   RegisterData,
   StoredUser,
   User,
+  WorkspaceType,
 } from '@/types/auth';
 
 const USERS_KEY = 'mock_users';
@@ -42,14 +45,32 @@ function saveUsers(users: StoredUser[]): void {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
+function workspaceFromRole(role: StoredUser['role']): WorkspaceType {
+  const shell = getAppShell(role);
+  if (shell === 'admin') return 'ADMIN';
+  if (shell === 'supplier') return 'SUPPLIER';
+  if (shell === 'carrier') return 'CARRIER';
+  return 'INTERNAL';
+}
+
 function toPublicUser(user: StoredUser): User {
+  const orgType =
+    user.role === 'SUPPLIER' ? 'SUPPLIER' : user.role === 'CARRIER' ? 'CARRIER' : 'CUSTOMER';
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     team: user.team,
     role: user.role,
+    roles: [user.role],
+    permissions: [...getRolePermissions(user.role)],
+    availableWorkspaces: [workspaceFromRole(user.role)],
     organization: user.organization,
+    organizationId: `org-${user.id}`,
+    organizationInfo: user.organization
+      ? { id: `org-${user.id}`, name: user.organization, type: orgType }
+      : undefined,
+    organizationType: orgType,
   };
 }
 

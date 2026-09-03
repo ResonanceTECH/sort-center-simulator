@@ -1,5 +1,7 @@
 import type { AppRole } from '@/types/scm/roles';
+import type { ScmPermission } from '@/constants/scmPermissions';
 import type { PlanStatus } from '@/types/scm/planning';
+import { can } from '@/utils/can';
 
 export type PlanAction =
   | 'EDIT'
@@ -49,11 +51,38 @@ const API_PLAN_ACTION_MAP: Record<string, PlanAction> = {
   CHANGE_CARRIER: 'CHANGE_CARRIER',
 };
 
+type PlanKind = 'supply' | 'transport';
+
+function planActionPermission(action: PlanAction, planKind: PlanKind): ScmPermission {
+  const prefix = planKind === 'transport' ? 'transport_plan' : 'supply_plan';
+  switch (action) {
+    case 'EDIT':
+      return `${prefix}.update` as ScmPermission;
+    case 'CALCULATE':
+    case 'RECALCULATE':
+      return `${prefix}.calculate` as ScmPermission;
+    case 'SUBMIT':
+      return `${prefix}.submit` as ScmPermission;
+    case 'APPROVE':
+    case 'REJECT':
+      return `${prefix}.approve` as ScmPermission;
+    case 'ACTIVATE':
+      return planKind === 'supply'
+        ? 'supply_plan.activate'
+        : ('transport_plan.update' as ScmPermission);
+    case 'CHANGE_CARRIER':
+      return 'shipment.assign_carrier';
+    default:
+      return `${prefix}.read` as ScmPermission;
+  }
+}
+
 export function resolvePlanActions(
   role: AppRole | undefined,
   status: PlanStatus,
   apiActions: string[],
-  planKind: 'supply' | 'transport' = 'supply',
+  planKind: PlanKind = 'supply',
+  permissions?: readonly string[],
 ): PlanAction[] {
   if (!role) return [];
 
@@ -66,7 +95,11 @@ export function resolvePlanActions(
   return apiActions
     .map((key) => API_PLAN_ACTION_MAP[key])
     .filter((action): action is PlanAction => Boolean(action))
-    .filter((action) => roleSet.has(action) && statusSet.has(action));
+    .filter((action) => roleSet.has(action) && statusSet.has(action))
+    .filter((action) => {
+      if (!permissions) return true;
+      return can(permissions, planActionPermission(action, planKind));
+    });
 }
 
 export function transitionPlanStatus(status: PlanStatus, action: PlanAction): PlanStatus {

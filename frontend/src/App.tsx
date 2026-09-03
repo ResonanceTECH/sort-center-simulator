@@ -32,7 +32,9 @@ import {
   ScenarioParametersPage,
 } from '@/pages/project/ProjectSectionPages';
 import { internalScmRoutes, portalRoutes } from '@/routes/scmRoutes';
-import { getDefaultRoute } from '@/types/scm/roles';
+import { ForbiddenPage } from '@/pages/ForbiddenPage';
+import { resolveLandingPath } from '@/workspace/workspaceResolver';
+import { WorkspaceResolver } from '@/components/common/WorkspaceResolver';
 
 const LandingPage = lazy(() =>
   import('@/landing/pages/LandingPage').then((m) => ({ default: m.LandingPage })),
@@ -46,7 +48,7 @@ function GuestRoute({ children }: { children: ReactNode }) {
   }
 
   if (isAuthenticated && user) {
-    return <Navigate to={getDefaultRoute(user.role)} replace />;
+    return <Navigate to={resolveLandingPath(user)} replace />;
   }
 
   return children;
@@ -101,9 +103,11 @@ export function App() {
         </Route>
 
         {portalRoutes()}
+        <Route path="/workspace" element={<WorkspaceResolver />} />
+        <Route path="/403" element={<ForbiddenPage />} />
       </Route>
 
-      <Route path="/dashboard" element={<Navigate to="/home" replace />} />
+      <Route path="/dashboard" element={<WorkspaceResolver />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -228,7 +228,7 @@ export const ROUTE_PERMISSIONS: Record<string, RoleAccess> = {
 export function canAccessRoute(role: AppRole | undefined, path: string): boolean {
   if (!role) return false;
 
-  const normalized = path.split('?')[0] ?? path;
+  const normalized = (path.split('?')[0] ?? path);
   const exact = ROUTE_PERMISSIONS[normalized];
   if (exact?.[role]) return exact[role] !== 'hidden';
 

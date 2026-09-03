@@ -18,15 +18,18 @@ import type { TransportLane } from '@/types/scm/planning';
 const CONFIRM_ACTIONS: PlanAction[] = ['SUBMIT', 'APPROVE', 'REJECT', 'ACTIVATE'];
 
 export function TransportPlanPage() {
-  const { role } = usePermissions();
+  const { role, permissions } = usePermissions();
   const showSnackbar = useUiStore((s) => s.showSnackbar);
   const { data, isLoading, error, refetch } = useTransportPlanQuery();
   const planAction = useExecutePlanActionMutation('transport');
   const [pendingAction, setPendingAction] = useState<PlanAction | null>(null);
 
   const allowedActions = useMemo(
-    () => (data ? resolvePlanActions(role, data.status, data.availableActions, 'transport') : []),
-    [data, role],
+    () =>
+      data
+        ? resolvePlanActions(role, data.status, data.availableActions, 'transport', permissions)
+        : [],
+    [data, role, permissions],
   );
 
   const runAction = useCallback(

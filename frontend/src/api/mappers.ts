@@ -1,4 +1,6 @@
-import type { User, UserApiResponse } from '@/types/auth';
+import type { MeApiResponse, OrganizationInfo, User, UserApiResponse, WorkspaceType } from '@/types/auth';
+import type { AppRole } from '@/types/scm/roles';
+import { getRolePermissions } from '@/constants/scmPermissions';
 import type {
   CreateProjectApiResponse,
   ProjectActiveRun,
@@ -33,15 +35,99 @@ export function mapAuthToken(dto: { access_token?: string; token?: string }): st
   return token;
 }
 
+const KNOWN_ROLES: AppRole[] = [
+  'ADMIN',
+  'SUPPLY_CHAIN_MANAGER',
+  'SUPPLY_PLANNER',
+  'LOGISTICS_MANAGER',
+  'ANALYST',
+  'SUPPLIER',
+  'CARRIER',
+];
+
+function asAppRole(value: string | undefined, fallback: AppRole = 'SUPPLY_CHAIN_MANAGER'): AppRole {
+  if (value && (KNOWN_ROLES as string[]).includes(value)) {
+    return value as AppRole;
+  }
+  return fallback;
+}
+
+function asWorkspace(value: string): WorkspaceType | null {
+  if (value === 'INTERNAL' || value === 'ADMIN' || value === 'SUPPLIER' || value === 'CARRIER') {
+    return value;
+  }
+  return null;
+}
+
+function workspacesFromRoles(roles: AppRole[]): WorkspaceType[] {
+  const set = new Set<WorkspaceType>();
+  for (const role of roles) {
+    if (role === 'ADMIN') set.add('ADMIN');
+    else if (role === 'SUPPLIER') set.add('SUPPLIER');
+    else if (role === 'CARRIER') set.add('CARRIER');
+    else set.add('INTERNAL');
+  }
+  return (['ADMIN', 'INTERNAL', 'SUPPLIER', 'CARRIER'] as WorkspaceType[]).filter((w) => set.has(w));
+}
+
 export function mapUser(dto: UserApiResponse): User {
-  const role = dto.role ?? dto.roles?.[0] ?? 'SUPPLY_CHAIN_MANAGER';
+  const nested = dto.user;
+  const roleCodes = (dto.roles ?? (dto.role ? [dto.role] : [])).map(String);
+  const roles = (roleCodes.length ? roleCodes : ['SUPPLY_CHAIN_MANAGER']).map((r) => asAppRole(r));
+  const role = asAppRole(dto.role ? String(dto.role) : roles[0], roles[0]);
+
+  const orgRaw = dto.organization;
+  let organizationInfo: OrganizationInfo | undefined;
+  let organizationName: string | undefined;
+  if (orgRaw && typeof orgRaw === 'object') {
+    organizationInfo = orgRaw;
+    organizationName = orgRaw.name;
+  } else if (typeof orgRaw === 'string') {
+    organizationName = orgRaw;
+  }
+
+  const availableWorkspaces =
+    (dto.available_workspaces ?? dto.availableWorkspaces ?? [])
+      .map(asWorkspace)
+      .filter((w): w is WorkspaceType => w != null);
+
   return {
-    id: dto.id,
-    name: dto.name,
-    email: dto.email,
-    team: dto.team,
+    id: nested?.id ?? dto.id ?? '',
+    name: nested?.name ?? dto.name ?? '',
+    email: nested?.email ?? dto.email ?? '',
+    team: nested?.team ?? dto.team,
     role,
-    organization: dto.organization ?? dto.organization_id,
+    roles,
+    permissions: Array.isArray(dto.permissions) ? dto.permissions : [...getRolePermissions(role)],
+    availableWorkspaces: availableWorkspaces.length ? availableWorkspaces : workspacesFromRoles(roles),
+    organization: organizationName ?? dto.organization_id ?? dto.organizationId,
+    organizationId: dto.organization_id ?? dto.organizationId ?? organizationInfo?.id,
+    organizationInfo,
+    organizationType: dto.organization_type ?? dto.organizationType ?? organizationInfo?.type,
+  };
+}
+
+export function mapMe(dto: MeApiResponse): User {
+  const roles = (dto.roles ?? (dto.role ? [dto.role] : [])).map((r) => asAppRole(String(r)));
+  const role = roles[0] ?? 'SUPPLY_CHAIN_MANAGER';
+  const org = dto.organization ?? undefined;
+  const workspaces = (dto.available_workspaces ?? [])
+    .map(asWorkspace)
+    .filter((w): w is WorkspaceType => w != null);
+
+  return {
+    id: dto.user?.id ?? dto.id ?? '',
+    name: dto.user?.name ?? dto.name ?? '',
+    email: dto.user?.email ?? dto.email ?? '',
+    team: dto.user?.team ?? dto.team,
+    role,
+    roles: roles.length ? roles : [role],
+    permissions: dto.permissions ?? [...getRolePermissions(role)],
+    availableWorkspaces: workspaces.length ? workspaces : workspacesFromRoles(roles.length ? roles : [role]),
+    organization: org?.name ?? dto.organization_id,
+    organizationId: org?.id ?? dto.organization_id,
+    organizationInfo: org ?? undefined,
+    organizationType: dto.organization_type ?? org?.type,
   };
 }
 

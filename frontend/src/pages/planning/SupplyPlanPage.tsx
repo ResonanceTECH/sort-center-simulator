@@ -18,14 +18,17 @@ import { kit } from '@/ui-kit/tokens';
 const CONFIRM_ACTIONS: PlanAction[] = ['SUBMIT', 'APPROVE', 'REJECT', 'ACTIVATE'];
 
 export function SupplyPlanPage() {
-  const { role } = usePermissions();
+  const { role, permissions } = usePermissions();
   const { data, isLoading, error, refetch } = useSupplyPlanQuery();
   const planAction = useExecutePlanActionMutation('supply');
   const [pendingAction, setPendingAction] = useState<PlanAction | null>(null);
 
   const allowedActions = useMemo(
-    () => (data ? resolvePlanActions(role, data.status, data.availableActions, 'supply') : []),
-    [data, role],
+    () =>
+      data
+        ? resolvePlanActions(role, data.status, data.availableActions, 'supply', permissions)
+        : [],
+    [data, role, permissions],
   );
 
   const runAction = useCallback(

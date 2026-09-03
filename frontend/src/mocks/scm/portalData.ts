@@ -14,6 +14,12 @@ export interface PortalVehicle {
 }
 
 const CARRIER_VEHICLES: Record<string, PortalVehicle[]> = {
+  'Carrier Vector': [
+    { id: 'veh-1', plate: 'А123BC 77', type: 'Фура 20т', status: 'NORMAL', assignedShipmentId: 'SH-0100', capacity: '20 т', driver: 'И. Сидоров' },
+    { id: 'veh-2', plate: 'В456DE 77', type: 'Фура 20т', status: 'WARNING', assignedShipmentId: 'SH-0103', capacity: '20 т', driver: 'П. Иванов' },
+    { id: 'veh-3', plate: 'Е789FG 50', type: 'Грузовик 10т', status: 'NORMAL', capacity: '10 т' },
+    { id: 'veh-4', plate: 'К012HI 16', type: 'Фура 20т', status: 'INFO', assignedShipmentId: 'SH-0106', capacity: '20 т', driver: 'А. Козлов' },
+  ],
   'Carrier C': [
     { id: 'veh-1', plate: 'А123BC 77', type: 'Фура 20т', status: 'NORMAL', assignedShipmentId: 'SH-0100', capacity: '20 т', driver: 'И. Сидоров' },
     { id: 'veh-2', plate: 'В456DE 77', type: 'Фура 20т', status: 'WARNING', assignedShipmentId: 'SH-0103', capacity: '20 т', driver: 'П. Иванов' },
@@ -27,7 +33,7 @@ const CARRIER_VEHICLES: Record<string, PortalVehicle[]> = {
 };
 
 export function getPortalVehicles(organization: string): PortalVehicle[] {
-  return CARRIER_VEHICLES[organization] ?? CARRIER_VEHICLES['Carrier C'] ?? [];
+  return CARRIER_VEHICLES[organization] ?? CARRIER_VEHICLES['Carrier Vector'] ?? [];
 }
 
 export function getPortalIncidents(

@@ -31,4 +31,24 @@ describe('resolveShipmentActions (§40)', () => {
   it('returns empty when role is missing', () => {
     expect(resolveShipmentActions(undefined, 'IN_TRANSIT', ['CANCEL'])).toEqual([]);
   });
+
+  it('hides cancel when permission bag lacks shipment.cancel (ADMIN read-only)', () => {
+    const actions = resolveShipmentActions(
+      'ADMIN',
+      'IN_TRANSIT',
+      ['CHANGE_CARRIER', 'CANCEL', 'CREATE_INCIDENT'],
+      ['shipment.read', 'users.read'],
+    );
+    expect(actions).toEqual([]);
+  });
+
+  it('keeps cancel when shipment.cancel is present', () => {
+    const actions = resolveShipmentActions(
+      'LOGISTICS_MANAGER',
+      'IN_TRANSIT',
+      ['CANCEL', 'CHANGE_CARRIER'],
+      ['shipment.cancel', 'shipment.assign_carrier', 'shipment.read'],
+    );
+    expect(actions).toEqual(expect.arrayContaining(['CANCEL', 'CHANGE_CARRIER']));
+  });
 });

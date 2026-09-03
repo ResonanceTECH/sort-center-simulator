@@ -1,3 +1,5 @@
+import { landingForRole } from '@/workspace/workspaceResolver';
+
 export type AppRole =
   | 'ADMIN'
   | 'SUPPLY_CHAIN_MANAGER'
@@ -26,24 +28,9 @@ export function getAppShell(role: AppRole): AppShell {
   return 'internal';
 }
 
-/** JTBD landing page per role (Page Map). */
+/** JTBD landing page per role (TZ §10). */
 export function getDefaultRoute(role: AppRole): string {
-  switch (role) {
-    case 'ADMIN':
-      return '/admin';
-    case 'SUPPLY_CHAIN_MANAGER':
-    case 'LOGISTICS_MANAGER':
-    case 'ANALYST':
-      return '/home';
-    case 'SUPPLY_PLANNER':
-      return '/planning';
-    case 'SUPPLIER':
-      return '/supplier/dashboard';
-    case 'CARRIER':
-      return '/carrier/dashboard';
-    default:
-      return '/home';
-  }
+  return landingForRole(role);
 }
 
 export const ROLE_LABELS: Record<AppRole, string> = {

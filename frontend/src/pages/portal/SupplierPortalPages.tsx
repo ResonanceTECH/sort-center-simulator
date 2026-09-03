@@ -85,7 +85,7 @@ export function SupplierOrdersPage() {
 export function SupplierShipmentsPage() {
   const { user } = useAuth();
   const supplierItems = useMemo(
-    () => filterShipmentsByOrganization(user?.organization ?? 'Supplier B', 'supplier', 10),
+    () => filterShipmentsByOrganization(user?.organization ?? 'Supplier Alpha', 'supplier', 25),
     [user?.organization],
   );
 
@@ -107,6 +107,43 @@ export function SupplierShipmentsPage() {
           data={supplierItems}
           columns={columns}
           total={supplierItems.length}
+          page={0}
+          pageSize={25}
+          onPageChange={() => {}}
+          getRowId={(row) => row.id}
+        />
+      </KitCard>
+    </PortalLayout>
+  );
+}
+
+/** Carrier shipments list — same table pattern as supplier, scoped to carrier org. */
+export function CarrierShipmentsPage() {
+  const { user } = useAuth();
+  const items = useMemo(
+    () => filterShipmentsByOrganization(user?.organization ?? 'Carrier Vector', 'carrier', 25),
+    [user?.organization],
+  );
+
+  const columns = useMemo<DataTableColumn<(typeof items)[0]>[]>(
+    () => [
+      { id: 'id', header: 'ID', cell: (row) => row.id },
+      { id: 'supplier', header: 'Поставщик', cell: (row) => row.supplierName },
+      { id: 'route', header: COMMON.routeCol, cell: (row) => `${row.origin} → ${row.destination}` },
+      { id: 'status', header: COMMON.status, cell: (row) => SHIPMENT_STATUS_LABELS[row.status] ?? row.status },
+      { id: 'eta', header: 'ETA', cell: (row) => new Date(row.forecastEta).toLocaleString('ru-RU') },
+    ],
+    [],
+  );
+
+  return (
+    <PortalLayout shell="carrier">
+      <PageHeader title="Перевозки" subtitle="Только назначенные вашей организации" />
+      <KitCard variant="flat" padding="none">
+        <DataTable
+          data={items}
+          columns={columns}
+          total={items.length}
           page={0}
           pageSize={25}
           onPageChange={() => {}}

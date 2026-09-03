@@ -24,7 +24,8 @@ describe('SCM mock service smoke (§66)', () => {
 
   it('exposes seven demo personas for role-based flows', () => {
     const roles = new Set(DEMO_USERS.map((u) => u.role));
-    expect(DEMO_USERS).toHaveLength(7);
+    expect(roles.size).toBe(7);
+    expect(DEMO_USERS.length).toBeGreaterThanOrEqual(7);
     expect(roles).toEqual(
       new Set([
         'SUPPLY_CHAIN_MANAGER',

@@ -37,13 +37,15 @@ describe('authMock', () => {
       rememberMe: false,
     });
 
-    await expect(getCurrentUserMock(token)).resolves.toEqual({
+    await expect(getCurrentUserMock(token)).resolves.toMatchObject({
       id: 'demo-1',
       name: 'Анна Смирнова',
       email: 'demo@sortcenter.ru',
       team: 'Supply Chain',
-      role: 'SUPPLY_CHAIN_MANAGER',
-      organization: 'Logus Nova',
+      role: 'LOGISTICS_MANAGER',
+      roles: ['LOGISTICS_MANAGER'],
+      organization: 'ООО Ритейл',
+      availableWorkspaces: ['INTERNAL'],
     });
   });
 });
