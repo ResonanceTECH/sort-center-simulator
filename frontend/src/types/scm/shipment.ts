@@ -2,6 +2,7 @@ import type { ExceptionSummary } from '@/types/scm/exception';
 import type { IncidentSummary } from '@/types/scm/incident';
 import type { LiveMapData } from '@/types/scm/map';
 import type { MetricValue } from '@/types/scm/metric';
+import type { SemanticStatus } from '@/types/scm/semantic';
 
 export type ShipmentStatus =
   | 'DRAFT'
@@ -13,6 +14,8 @@ export type ShipmentStatus =
   | 'ARRIVED'
   | 'DELIVERED'
   | 'CANCELLED';
+
+export type TrackingStatus = 'OK' | 'STALE' | 'NO_DATA';
 
 export interface ShipmentSummary {
   id: string;
@@ -28,6 +31,16 @@ export interface ShipmentSummary {
   forecastEta: string;
   deviationMinutes: number;
   slaRisk: MetricValue;
+  /** Risk model separate from lifecycle status. */
+  riskStatus: SemanticStatus;
+  vehiclePlate?: string;
+  lastTrackingAt?: string;
+  trackingStatus: TrackingStatus;
+  /** 0..1 progress along lifecycle for board viz. */
+  progress: number;
+  warehouse?: string;
+  routeLabel?: string;
+  availableActions: string[];
 }
 
 export interface ShipmentTimelineEvent {
@@ -64,7 +77,6 @@ export interface ShipmentDetail extends ShipmentSummary {
   activity: ShipmentActivityItem[];
   mapView: LiveMapData;
   timeline: ShipmentTimelineEvent[];
-  availableActions: string[];
 }
 
 export interface ShipmentFilters {
@@ -77,10 +89,21 @@ export interface ShipmentFilters {
   dateFrom?: string;
   dateTo?: string;
   search?: string;
+  trackingStatus?: string;
   page?: number;
   pageSize?: number;
   sortBy?: string;
   sortDir?: 'asc' | 'desc';
+}
+
+/** Ops KPIs — computed on backend / mock, not in the browser. */
+export interface ShipmentOpsKpis {
+  active: MetricValue;
+  atRisk: MetricValue;
+  delayed: MetricValue;
+  noTracking: MetricValue;
+  avgDeviation: MetricValue;
+  otifToday: MetricValue;
 }
 
 export interface ShipmentsPageData {
@@ -88,4 +111,5 @@ export interface ShipmentsPageData {
   total: number;
   page: number;
   pageSize: number;
+  kpis: ShipmentOpsKpis;
 }

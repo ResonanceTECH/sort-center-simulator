@@ -26,4 +26,15 @@ describe('resolvePlanActions (§38)', () => {
     );
     expect(actions).toEqual(expect.arrayContaining(['RECALCULATE', 'CHANGE_CARRIER']));
   });
+
+  it('blocks approve when supply_plan.approve is missing', () => {
+    const actions = resolvePlanActions(
+      'SUPPLY_CHAIN_MANAGER',
+      'REVIEW',
+      ['APPROVE', 'REJECT'],
+      'supply',
+      ['supply_plan.read', 'supply_plan.submit'],
+    );
+    expect(actions).toEqual([]);
+  });
 });

@@ -1,6 +1,7 @@
 import { apiClient } from '@/api/client';
-import { mapAuthToken, mapUser } from '@/api/mappers';
-import type { AuthApiResponse, LoginData, RegisterData, User } from '@/types/auth';
+import { mapAuthToken, mapMe, mapUser } from '@/api/mappers';
+import { setToken } from '@/services/auth/tokenStorage';
+import type { AuthApiResponse, LoginData, MeApiResponse, RegisterData, User } from '@/types/auth';
 
 export interface LoginApiPayload {
   email: string;
@@ -21,11 +22,14 @@ export async function loginApi(data: LoginData): Promise<{ user: User; token: st
   };
 
   const { data: response } = await apiClient.post<AuthApiResponse>('/auth/login', payload);
-
-  return {
-    user: mapUser(response.user),
-    token: mapAuthToken(response),
-  };
+  const token = mapAuthToken(response);
+  setToken(token);
+  try {
+    const me = await getCurrentUserApi();
+    return { user: me, token };
+  } catch {
+    return { user: mapUser(response.user), token };
+  }
 }
 
 export async function registerApi(data: RegisterData): Promise<{ user: User; token: string }> {
@@ -37,11 +41,14 @@ export async function registerApi(data: RegisterData): Promise<{ user: User; tok
   };
 
   const { data: response } = await apiClient.post<AuthApiResponse>('/auth/register', payload);
-
-  return {
-    user: mapUser(response.user),
-    token: mapAuthToken(response),
-  };
+  const token = mapAuthToken(response);
+  setToken(token);
+  try {
+    const me = await getCurrentUserApi();
+    return { user: me, token };
+  } catch {
+    return { user: mapUser(response.user), token };
+  }
 }
 
 export async function forgotPasswordApi(email: string): Promise<void> {
@@ -51,6 +58,6 @@ export async function forgotPasswordApi(email: string): Promise<void> {
 }
 
 export async function getCurrentUserApi(): Promise<User> {
-  const { data } = await apiClient.get<AuthApiResponse['user']>('/auth/me');
-  return mapUser(data);
+  const { data } = await apiClient.get<MeApiResponse>('/auth/me');
+  return mapMe(data);
 }

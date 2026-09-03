@@ -22,12 +22,45 @@ class ForgotPasswordRequest(BaseModel):
 
 
 class UserResponse(BaseModel):
+    """Compact user payload on login/register (backward compatible)."""
+
     id: str
     name: str
     email: str
     team: Optional[str] = None
     organization_id: Optional[str] = None
     roles: list[str] = []
+    role: Optional[str] = None
+
+
+class OrganizationOut(BaseModel):
+    id: str
+    name: str
+    type: str
+
+
+class MeUserOut(BaseModel):
+    id: str
+    name: str
+    email: str
+    team: Optional[str] = None
+
+
+class MeResponse(BaseModel):
+    """GET /auth/me — session context for workspace + permission checks."""
+
+    user: MeUserOut
+    organization: Optional[OrganizationOut] = None
+    organization_type: Optional[str] = None
+    roles: list[str] = []
+    permissions: list[str] = []
+    available_workspaces: list[str] = []
+    # Flat aliases for older FE mappers / smoke checks
+    id: Optional[str] = None
+    name: Optional[str] = None
+    email: Optional[str] = None
+    team: Optional[str] = None
+    organization_id: Optional[str] = None
     role: Optional[str] = None
 
 

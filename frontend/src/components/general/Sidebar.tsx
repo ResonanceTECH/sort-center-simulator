@@ -21,6 +21,7 @@ import {
   type NavItemConfig,
 } from '@/constants/navigation';
 import { canAccessRoute } from '@/constants/routePermissions';
+import { filterNavByPermissions } from '@/components/common/RoleBasedNavigation';
 import { NavIcon } from '@/components/general/NavIcon';
 import { useControlTowerQuery } from '@/hooks/scm/useScmQueries';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -49,8 +50,11 @@ function LogoMark() {
   );
 }
 
-function filterNavGroup(group: NavGroupConfig, role: ReturnType<typeof usePermissions>['role']): NavGroupConfig | null {
-  const items = group.items.filter((item) => canAccessRoute(role, item.path));
+function filterNavGroup(
+  group: NavGroupConfig,
+  role: ReturnType<typeof usePermissions>['role'],
+): NavGroupConfig | null {
+  const items = group.items.filter((item) => canAccessRoute(role, item.path.split('?')[0] ?? item.path));
   if (items.length === 0) return null;
   return { ...group, items };
 }
@@ -63,15 +67,16 @@ interface SidebarContentProps {
 function SidebarContent({ shell, onNavigate }: SidebarContentProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { role } = usePermissions();
+  const { role, permissions } = usePermissions();
   const { data: towerData } = useControlTowerQuery();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   const groups = useMemo(() => {
-    return getNavGroupsForRole(role)
+    const byRole = getNavGroupsForRole(role)
       .map((g) => filterNavGroup(g, role))
       .filter(Boolean) as NavGroupConfig[];
-  }, [role]);
+    return filterNavByPermissions(byRole, permissions);
+  }, [role, permissions]);
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -79,7 +84,13 @@ function SidebarContent({ shell, onNavigate }: SidebarContentProps) {
   };
 
   const isActive = (path: string) => {
-    if (location.pathname === path) return true;
+    const bare = path.split('?')[0] ?? path;
+    if (location.pathname === bare) {
+      if (path.includes('?')) {
+        return location.search.includes(path.split('?')[1] ?? '');
+      }
+      return true;
+    }
     const exactOnly = new Set([
       '/home',
       '/planning',
@@ -89,9 +100,11 @@ function SidebarContent({ shell, onNavigate }: SidebarContentProps) {
       '/carrier',
       '/carrier/dashboard',
       '/control-tower',
+      '/analytics',
+      '/shipments',
     ]);
-    if (exactOnly.has(path)) return location.pathname === path;
-    return location.pathname.startsWith(`${path}/`);
+    if (exactOnly.has(bare)) return location.pathname === bare;
+    return location.pathname.startsWith(`${bare}/`);
   };
 
   const getBadge = (key?: NavItemConfig['badgeKey']) => {

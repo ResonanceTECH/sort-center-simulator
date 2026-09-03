@@ -17,6 +17,7 @@ from app.models.master_data import Inventory
 from app.models.shipment import Shipment, ShipmentItem
 from app.schemas.scm.common import MetricOut
 from app.security.context import AuthContext
+from app.security.scope import apply_exception_scope
 
 router = APIRouter(prefix="/exceptions", tags=["exceptions"])
 
@@ -33,7 +34,7 @@ def list_exceptions(
     ctx: AuthContext = Depends(require_permission("exception.read")),
     db: Session = Depends(get_db),
 ):
-    stmt = select(ScmException).where(ScmException.organization_id == ctx.organization_id)
+    stmt = apply_exception_scope(select(ScmException), ctx)
     if severity:
         stmt = stmt.where(ScmException.severity == severity)
     if type:
@@ -44,9 +45,9 @@ def list_exceptions(
         stmt = stmt.where(ScmException.owner_id == owner)
     if shipment:
         stmt = stmt.where(ScmException.shipment_id == shipment)
-    if supplier:
+    if ctx.linked_supplier_id is None and supplier:
         stmt = stmt.where(ScmException.supplier_id == supplier)
-    if carrier:
+    if ctx.linked_carrier_id is None and carrier:
         stmt = stmt.where(ScmException.carrier_id == carrier)
 
     items = db.scalars(stmt.order_by(ScmException.created_at.desc())).all()
@@ -85,13 +86,18 @@ def get_exception(
     ctx: AuthContext = Depends(require_permission("exception.read")),
     db: Session = Depends(get_db),
 ):
-    e = db.scalars(
-        select(ScmException).where(
-            ScmException.id == exception_id,
-            ScmException.organization_id == ctx.organization_id,
-        )
-    ).first()
+    e = db.get(ScmException, exception_id)
     if e is None:
+        raise NotFoundError("EXCEPTION_NOT_FOUND", "Exception not found")
+    if ctx.linked_supplier_id is not None and e.supplier_id != ctx.linked_supplier_id:
+        raise NotFoundError("EXCEPTION_NOT_FOUND", "Exception not found")
+    if ctx.linked_carrier_id is not None and e.carrier_id != ctx.linked_carrier_id:
+        raise NotFoundError("EXCEPTION_NOT_FOUND", "Exception not found")
+    if (
+        ctx.linked_supplier_id is None
+        and ctx.linked_carrier_id is None
+        and e.organization_id != ctx.organization_id
+    ):
         raise NotFoundError("EXCEPTION_NOT_FOUND", "Exception not found")
     ship_ref = None
     if e.shipment_id:
@@ -117,13 +123,18 @@ def exception_impact(
     ctx: AuthContext = Depends(require_permission("exception.read")),
     db: Session = Depends(get_db),
 ):
-    e = db.scalars(
-        select(ScmException).where(
-            ScmException.id == exception_id,
-            ScmException.organization_id == ctx.organization_id,
-        )
-    ).first()
+    e = db.get(ScmException, exception_id)
     if e is None:
+        raise NotFoundError("EXCEPTION_NOT_FOUND", "Exception not found")
+    if ctx.linked_supplier_id is not None and e.supplier_id != ctx.linked_supplier_id:
+        raise NotFoundError("EXCEPTION_NOT_FOUND", "Exception not found")
+    if ctx.linked_carrier_id is not None and e.carrier_id != ctx.linked_carrier_id:
+        raise NotFoundError("EXCEPTION_NOT_FOUND", "Exception not found")
+    if (
+        ctx.linked_supplier_id is None
+        and ctx.linked_carrier_id is None
+        and e.organization_id != ctx.organization_id
+    ):
         raise NotFoundError("EXCEPTION_NOT_FOUND", "Exception not found")
 
     affected_skus = []

@@ -36,13 +36,13 @@ describe('mappers', () => {
         email: 'ivan@example.com',
         team: 'SC-1',
       }),
-    ).toEqual({
+    ).toMatchObject({
       id: '1',
       name: 'Иван',
       email: 'ivan@example.com',
       team: 'SC-1',
       role: 'SUPPLY_CHAIN_MANAGER',
-      organization: undefined,
+      roles: ['SUPPLY_CHAIN_MANAGER'],
     });
   });
 

@@ -5,7 +5,6 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -13,8 +12,13 @@ from app.core.errors import ForbiddenError
 from app.core.security import decode_access_token
 from app.models.user import User
 from app.security.context import AuthContext
-from app.services.scm_auth_service import get_primary_organization_id, get_user_roles
-from app.security.permissions import ROLE_PERMISSIONS
+from app.services.scm_auth_service import (
+    get_primary_organization,
+    get_user_permissions,
+    get_user_roles,
+    resolve_workspaces,
+)
+from app.security.scope import resolve_linked_partner_ids
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -38,18 +42,25 @@ def get_auth_context(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> AuthContext:
-    org_id = get_primary_organization_id(db, user.id)
-    if org_id is None:
+    org = get_primary_organization(db, user.id)
+    if org is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No organization assigned")
-    roles = get_user_roles(db, user.id, org_id)
-    permissions: set[str] = set()
-    for role in roles:
-        permissions.update(ROLE_PERMISSIONS.get(role, set()))
+    roles = get_user_roles(db, user.id, org.id)
+    permissions = get_user_permissions(db, user.id, org.id)
+    linked_supplier_id, linked_carrier_id = resolve_linked_partner_ids(
+        db,
+        organization_id=org.id,
+        organization_type=org.type,
+    )
     return AuthContext(
         user_id=user.id,
-        organization_id=org_id,
+        organization_id=org.id,
         roles=roles,
         permissions=permissions,
+        organization_type=org.type,
+        linked_supplier_id=linked_supplier_id,
+        linked_carrier_id=linked_carrier_id,
+        available_workspaces=resolve_workspaces(roles),
     )
 
 

@@ -45,13 +45,13 @@ const SHIPMENT_MAP_LAYERS: MapLayerType[] = ['shipments', 'routes', 'hubs', 'war
 export function ShipmentDetailPage() {
   const { shipmentId = '' } = useParams();
   const navigate = useNavigate();
-  const { role } = usePermissions();
+  const { role, permissions } = usePermissions();
   const { data, isLoading, error, refetch } = useShipmentQuery(shipmentId);
   const changeCarrier = useChangeCarrierMutation();
   const cancelShipment = useCancelShipmentMutation();
 
   const allowedActions = data
-    ? resolveShipmentActions(role, data.status, data.availableActions)
+    ? resolveShipmentActions(role, data.status, data.availableActions, permissions)
     : [];
 
   const canAction = (action: ShipmentAction) => allowedActions.includes(action);

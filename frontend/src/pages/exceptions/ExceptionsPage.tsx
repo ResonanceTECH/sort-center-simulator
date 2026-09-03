@@ -2,6 +2,7 @@ import { Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { EntityStates } from '@/components/common/EntityStates';
 import { PageHeader } from '@/components/common/PageHeader';
+import { ContextualDocsLink } from '@/docs/components/ContextualDocsLink';
 import { ExceptionCard } from '@/components/scenarios/ExceptionCard';
 import { FilterBar } from '@/components/tables/FilterBar';
 import { useExceptionsQuery } from '@/hooks/scm/useScmQueries';
@@ -28,6 +29,7 @@ export function ExceptionsPage() {
           { label: NAV_LABELS.controlTower, to: '/control-tower' },
           { label: 'Отклонения' },
         ]}
+        actions={<ContextualDocsLink slug="execution/exceptions" />}
       />
 
       <FilterBar

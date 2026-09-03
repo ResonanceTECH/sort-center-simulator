@@ -50,11 +50,25 @@ export async function fetchShipmentsMock(filters: ShipmentFilters = {}): Promise
   const page = filters.page ?? 0;
   const pageSize = filters.pageSize ?? 25;
 
-  if (filters.status === 'at-risk') {
-    items = items.filter((s) => s.slaRisk.status === 'CRITICAL' || s.slaRisk.status === 'HIGH');
+  if (filters.status === 'at-risk' || filters.risk === 'at-risk') {
+    items = items.filter((s) => s.riskStatus === 'CRITICAL' || s.riskStatus === 'HIGH');
+  } else if (filters.risk) {
+    const risk = filters.risk.toUpperCase();
+    items = items.filter((s) => {
+      if (risk === 'MEDIUM') return s.riskStatus === 'WARNING';
+      return s.riskStatus === risk;
+    });
   }
   if (filters.status === 'in-transit') {
     items = items.filter((s) => s.status === 'IN_TRANSIT');
+  } else if (filters.status === 'delayed') {
+    items = items.filter((s) => s.deviationMinutes >= 30);
+  } else if (
+    filters.status &&
+    filters.status !== 'at-risk' &&
+    !['in-transit', 'delayed'].includes(filters.status)
+  ) {
+    items = items.filter((s) => s.status === filters.status);
   }
   if (filters.carrier) {
     items = items.filter((s) => s.carrierId === filters.carrier);
@@ -62,18 +76,63 @@ export async function fetchShipmentsMock(filters: ShipmentFilters = {}): Promise
   if (filters.supplier) {
     items = items.filter((s) => s.supplierId === filters.supplier);
   }
+  if (filters.route) {
+    items = items.filter((s) => (s.routeLabel ?? `${s.origin} → ${s.destination}`).includes(filters.route!));
+  }
+  if (filters.warehouse) {
+    items = items.filter((s) => s.warehouse === filters.warehouse);
+  }
+  if (filters.trackingStatus === 'no_data' || filters.trackingStatus === 'NO_DATA') {
+    items = items.filter((s) => s.trackingStatus === 'NO_DATA');
+  } else if (filters.trackingStatus) {
+    items = items.filter((s) => s.trackingStatus === filters.trackingStatus);
+  }
   if (filters.search) {
     const q = filters.search.toLowerCase();
     items = items.filter(
       (s) =>
         s.id.toLowerCase().includes(q) ||
         s.supplierName.toLowerCase().includes(q) ||
-        s.carrierName.toLowerCase().includes(q),
+        s.carrierName.toLowerCase().includes(q) ||
+        s.origin.toLowerCase().includes(q) ||
+        s.destination.toLowerCase().includes(q),
     );
   }
 
+  // Ops KPIs from full unfiltered universe (backend responsibility)
+  const universe = SHIPMENTS_MOCK.filter((s) => s.status !== 'CANCELLED');
+  const active = universe.filter((s) => s.status !== 'DELIVERED');
+  const atRisk = active.filter((s) => s.riskStatus === 'HIGH' || s.riskStatus === 'CRITICAL');
+  const delayed = active.filter((s) => s.deviationMinutes >= 30);
+  const noTracking = active.filter((s) => s.trackingStatus === 'NO_DATA');
+  const avgDev =
+    active.length === 0
+      ? 0
+      : Math.round(active.reduce((sum, s) => sum + s.deviationMinutes, 0) / active.length);
+
   items = sortRows(items, filters.sortBy, filters.sortDir ?? 'asc');
-  return paginateRows(items, page, pageSize);
+  const pageData = paginateRows(items, page, pageSize);
+
+  return {
+    ...pageData,
+    kpis: {
+      active: { label: 'Активные поставки', value: active.length, status: 'NORMAL' },
+      atRisk: { label: 'At Risk', value: atRisk.length, status: atRisk.length ? 'HIGH' : 'SUCCESS' },
+      delayed: { label: 'Delayed', value: delayed.length, status: delayed.length ? 'CRITICAL' : 'SUCCESS' },
+      noTracking: {
+        label: 'No Tracking',
+        value: noTracking.length,
+        status: noTracking.length ? 'WARNING' : 'SUCCESS',
+      },
+      avgDeviation: {
+        label: 'Среднее отклонение ETA',
+        value: avgDev,
+        unit: ' мин',
+        status: avgDev > 45 ? 'WARNING' : 'NORMAL',
+      },
+      otifToday: { label: 'OTIF Today', value: '91.4', unit: '%', status: 'WARNING' },
+    },
+  };
 }
 
 export async function fetchShipmentMock(id: string) {

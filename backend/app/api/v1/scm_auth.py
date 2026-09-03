@@ -8,10 +8,11 @@ from sqlalchemy.orm import Session
 
 from app.api.deps.scm_auth import get_current_user
 from app.core.database import get_db
-from app.schemas.auth import ForgotPasswordRequest, RegisterRequest, UserResponse
+from app.schemas.auth import ForgotPasswordRequest, MeResponse, RegisterRequest, UserResponse
 from app.services.auth_service import register_user as legacy_register
 from app.services.scm_auth_service import (
     authenticate_user,
+    build_me_response,
     issue_auth_tokens,
     refresh_access_token,
     revoke_refresh_token,
@@ -80,9 +81,9 @@ def logout(body: LogoutRequest, db: Session = Depends(get_db)) -> None:
     revoke_refresh_token(db, body.refresh_token)
 
 
-@router.get("/me")
-def me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return user_to_dict(db, current_user)
+@router.get("/me", response_model=MeResponse)
+def me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> MeResponse:
+    return build_me_response(db, current_user)
 
 
 @router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT)

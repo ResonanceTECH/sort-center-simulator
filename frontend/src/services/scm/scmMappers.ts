@@ -72,17 +72,49 @@ export function mapShipmentsPage(data: unknown): ShipmentsPageData {
   const items = Array.isArray(row.items) ? row.items : [];
   const page = asNumber(pagination.page ?? row.page, 1);
   const pageSize = asNumber(pagination.page_size ?? row.pageSize, 25);
+  const mapped = items.map(mapShipmentSummary);
+  const kpisRaw = asRecord(row.kpis);
 
   return {
-    items: items.map(mapShipmentSummary),
+    items: mapped,
     total: asNumber(pagination.total ?? row.total, items.length),
     page: Math.max(0, page - 1),
     pageSize,
+    kpis: {
+      active: mapMetricDto(kpisRaw.active ?? { label: 'Активные поставки', value: 0, status: 'NORMAL' }, 'Активные поставки'),
+      atRisk: mapMetricDto(kpisRaw.atRisk ?? kpisRaw.at_risk ?? { label: KPI.atRisk, value: 0, status: 'NORMAL' }, KPI.atRisk),
+      delayed: mapMetricDto(kpisRaw.delayed ?? { label: KPI.delayed, value: 0, status: 'NORMAL' }, KPI.delayed),
+      noTracking: mapMetricDto(
+        kpisRaw.noTracking ?? kpisRaw.no_tracking ?? { label: 'No Tracking', value: 0, status: 'NORMAL' },
+        'No Tracking',
+      ),
+      avgDeviation: mapMetricDto(
+        kpisRaw.avgDeviation ?? kpisRaw.avg_deviation ?? { label: 'Среднее отклонение ETA', value: 0, unit: ' мин', status: 'NORMAL' },
+        'Среднее отклонение ETA',
+      ),
+      otifToday: mapMetricDto(
+        kpisRaw.otifToday ?? kpisRaw.otif_today ?? { label: 'OTIF Today', value: '—', status: 'NO_DATA' },
+        'OTIF Today',
+      ),
+    },
   };
 }
 
 export function mapShipmentSummary(dto: unknown): ShipmentSummary {
   const row = asRecord(dto);
+  const status = asString(row.status, 'DRAFT') as ShipmentSummary['status'];
+  const slaRisk = mapMetricDto(row.slaRisk ?? row.sla_risk, KPI.slaRisk);
+  const riskStatus = (asString(row.riskStatus ?? row.risk_status, slaRisk.status) ||
+    'NORMAL') as SemanticStatus;
+  const progressByStatus: Record<string, number> = {
+    PLANNED: 0.12,
+    ASSIGNED: 0.28,
+    ACCEPTED: 0.4,
+    READY_FOR_PICKUP: 0.52,
+    IN_TRANSIT: 0.72,
+    ARRIVED: 0.88,
+    DELIVERED: 1,
+  };
   return {
     id: asString(row.id),
     supplierId: asString(row.supplierId ?? row.supplier_id),
@@ -91,12 +123,23 @@ export function mapShipmentSummary(dto: unknown): ShipmentSummary {
     carrierName: asString(row.carrierName ?? row.carrier_name),
     origin: asString(row.origin),
     destination: asString(row.destination),
-    status: asString(row.status, 'DRAFT') as ShipmentSummary['status'],
+    status,
     pickupAt: asString(row.pickupAt ?? row.pickup_at),
     plannedEta: asString(row.plannedEta ?? row.planned_eta),
     forecastEta: asString(row.forecastEta ?? row.forecast_eta),
     deviationMinutes: asNumber(row.deviationMinutes ?? row.deviation_minutes),
-    slaRisk: mapMetricDto(row.slaRisk ?? row.sla_risk, KPI.slaRisk),
+    slaRisk,
+    riskStatus,
+    vehiclePlate: asString(row.vehiclePlate ?? row.vehicle_plate) || undefined,
+    lastTrackingAt: asString(row.lastTrackingAt ?? row.last_tracking_at) || undefined,
+    trackingStatus: (asString(row.trackingStatus ?? row.tracking_status, 'OK') ||
+      'OK') as ShipmentSummary['trackingStatus'],
+    progress: asNumber(row.progress, progressByStatus[status] ?? 0.1),
+    warehouse: asString(row.warehouse) || undefined,
+    routeLabel: asString(row.routeLabel ?? row.route_label) || undefined,
+    availableActions: Array.isArray(row.availableActions ?? row.available_actions)
+      ? ((row.availableActions ?? row.available_actions) as string[])
+      : [],
   };
 }
 

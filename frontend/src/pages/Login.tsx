@@ -21,7 +21,7 @@ import { PasswordField } from '@/components/PasswordField';
 import { useAuth } from '@/hooks/useAuth';
 import { AUTH_COLORS, pillButtonSx } from '@/styles/authStyles';
 import { LANDING } from '@/landing/styles/tokens';
-import { getDefaultRoute } from '@/types/scm/roles';
+import { resolveLandingPath } from '@/workspace/workspaceResolver';
 
 const schema = yup.object({
   email: yup
@@ -63,7 +63,7 @@ export function Login() {
       const user = await login(data);
       setSuccessOpen(true);
       setTimeout(() => {
-        navigate(getDefaultRoute(user.role));
+        navigate(resolveLandingPath(user));
       }, 600);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка входа');

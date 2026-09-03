@@ -1,5 +1,7 @@
 import type { AppRole } from '@/types/scm/roles';
+import type { ScmPermission } from '@/constants/scmPermissions';
 import type { ShipmentStatus } from '@/types/scm/shipment';
+import { can } from '@/utils/can';
 
 export type ShipmentAction =
   | 'READ'
@@ -93,10 +95,33 @@ export const API_ACTION_MAP: Record<string, ShipmentAction> = {
   CONFIRM_DELIVERY: 'CONFIRM_DELIVERY',
 };
 
+/** Action → SCM permission (backend still authorizes). */
+export const SHIPMENT_ACTION_PERMISSIONS: Record<ShipmentAction, ScmPermission> = {
+  READ: 'shipment.read',
+  CHANGE_CARRIER: 'shipment.assign_carrier',
+  ASSIGN_CARRIER: 'shipment.assign_carrier',
+  REPLAN: 'shipment.update',
+  CANCEL: 'shipment.cancel',
+  CREATE_SCENARIO: 'scenario.create',
+  CREATE_INCIDENT: 'incident.create',
+  CHANGE_ROUTE: 'shipment.change_route',
+  CHANGE_SLOT: 'shipment.reschedule',
+  CONFIRM_READY: 'shipment.confirm_ready',
+  UPLOAD_DOCUMENTS: 'documents.create',
+  REPORT_PROBLEM: 'incident.create',
+  ACCEPT: 'shipment.accept',
+  REJECT: 'shipment.reject',
+  ASSIGN_VEHICLE: 'vehicle.create',
+  CONFIRM_PICKUP: 'shipment.confirm_pickup',
+  REPORT_DELAY: 'shipment.report_delay',
+  CONFIRM_DELIVERY: 'shipment.confirm_delivery',
+};
+
 export function resolveShipmentActions(
   role: AppRole | undefined,
   status: ShipmentStatus,
   apiActions: string[],
+  permissions?: readonly string[],
 ): ShipmentAction[] {
   if (!role) return [];
 
@@ -107,5 +132,9 @@ export function resolveShipmentActions(
     .map((key) => API_ACTION_MAP[key])
     .filter((action): action is ShipmentAction => Boolean(action))
     .filter((action) => roleSet.has(action))
-    .filter((action) => statusSet.size === 0 || statusSet.has(action) || action === 'READ');
+    .filter((action) => statusSet.size === 0 || statusSet.has(action) || action === 'READ')
+    .filter((action) => {
+      if (!permissions) return true;
+      return can(permissions, SHIPMENT_ACTION_PERMISSIONS[action]);
+    });
 }
